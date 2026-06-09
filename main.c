@@ -100,6 +100,20 @@ void    test_strcmp(void) {
 	printf("\n");
 }
 
+
+extern ssize_t ft_write(int fd, const void *buf, size_t count);
+void    test_write(void) {
+
+
+	printf("------glibc write VS libasm ft_write -------\n\n");
+		
+	printf("write(1, \"Hello World\\n\", 12), ft_write(1, \"Hello World\\n\", 12) = ");write(1, "Hello World\n", 12);printf(", ");ft_write(1, "Hello World\n", 12);
+	printf("write(2, \"Hello World\\n\", 12), ft_write(2, \"Hello World\\n\", 12) = ");write(2, "Hello World\n", 12);printf(", ");ft_write(2, "Hello World\n", 12);
+	printf("write(s3), ft_write(s3) = ");
+
+	printf("\n");   
+}
+
 int		main(void) {
 
 	test_strlen();
