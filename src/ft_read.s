@@ -1,11 +1,12 @@
 
 section .text
-	extern __errno_location
-	global ft_write
+extern __errno_location
+    global ft_read
 
-ft_write:							    ; ssize_t write(int fd = rdi, const void *buf = rsi, size_t count = rdx); {
+
+ft_read:							    ; ssize_t read(int fd = rdi, void *buf = rsi, size_t count = rdx); {
 									    ;
-	mov		rax, 1					    ; 	ssize_t res = SYS_WRITE;
+	mov		rax, 0					    ; 	ssize_t res = SYS_READ;
 	syscall							    ;	res = syscall(res, fd, buf, count);
 	test	rax, rax				    ; 	if (res < 0)
 	js		.error					    ;		return (error(res));
@@ -23,4 +24,8 @@ ft_write:							    ; ssize_t write(int fd = rdi, const void *buf = rsi, size_t 
 	pop		rbx					        ;	stack--;
 	ret							        ;	return (res);
 									    ; }
-	
+
+
+
+    
+    

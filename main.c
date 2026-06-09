@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 
 extern size_t	ft_strlen(char const *s);
 void	test_strlen(void) {
@@ -111,13 +112,54 @@ void    test_write(void) {
     ssize_t glibc_res = write(1, "Hello World\n", 12);
     ssize_t libasm_res = ft_write(1, "Hello World\n", 12);
     printf("write(STDOUT), ft_write(STDOUT) = %zu, %zu\n", glibc_res, libasm_res);
+
 	glibc_res = write(2, "Hello World\n", 12);
     libasm_res = ft_write(2, "Hello World\n", 12);
     printf("write(STDERR), ft_write(STDERR) = %zu, %zu\n", glibc_res, libasm_res);
+
     glibc_res = write(55, "Hello World\n", 12);
     libasm_res = ft_write(55, "Hello World\n", 12);
     printf("write(FD=55), ft_write(FD=55)   = %ld, %ld\n", glibc_res, libasm_res);
+
 	printf("\n");   
+}
+
+extern ssize_t ft_read(int fd, void *buf, size_t count);
+void    test_read(void)
+{
+    char    glibc_buf[64];
+    char    libasm_buf[64];
+    ssize_t glibc_res;
+    ssize_t libasm_res;
+    int     pipefd[2];
+
+    printf("------glibc read VS libasm ft_read -------\n\n");
+
+    pipe(pipefd);
+    write(pipefd[1], "Hello World", 11);
+    glibc_res = read(pipefd[0], glibc_buf, 11);
+    glibc_buf[glibc_res] = '\0';
+    close(pipefd[0]);
+    close(pipefd[1]);
+    pipe(pipefd);
+    write(pipefd[1], "Hello World", 11);
+    libasm_res = ft_read(pipefd[0], libasm_buf, 11);
+    libasm_buf[libasm_res] = '\0';
+    close(pipefd[0]);
+    close(pipefd[1]);
+
+    printf("read(pipe),  ft_read(pipe)  = (%ld - %s), (%ld - %s)\n", glibc_res, glibc_buf, libasm_res, libasm_buf);
+
+
+    errno = 0;
+    glibc_res = read(55, glibc_buf, 11);
+    int temp1 = errno;
+    errno = 0;
+    libasm_res = ft_read(55, libasm_buf, 11);
+    int temp2 = errno;
+
+    printf("read(FD=55), ft_read(FD=55) = (%ld - errno %d), (%ld - errno %d)\n", glibc_res, temp1, libasm_res, temp2);
+    printf("\n");
 }
 
 int		main(void) {
@@ -126,7 +168,8 @@ int		main(void) {
 	test_strcpy();
 	test_strcmp();
 	test_write();
-
+    test_read();
+    
 	return (0);
 }
 
