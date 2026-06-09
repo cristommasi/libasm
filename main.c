@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <fcntl.h>
 
 extern size_t	ft_strlen(char const *s);
 void	test_strlen(void) {
@@ -107,10 +107,16 @@ void    test_write(void) {
 
 	printf("------glibc write VS libasm ft_write -------\n\n");
 		
-	printf("write(1, \"Hello World\\n\", 12), ft_write(1, \"Hello World\\n\", 12) = ");write(1, "Hello World\n", 12);printf(", ");ft_write(1, "Hello World\n", 12);
-	printf("write(2, \"Hello World\\n\", 12), ft_write(2, \"Hello World\\n\", 12) = ");write(2, "Hello World\n", 12);printf(", ");ft_write(2, "Hello World\n", 12);
-	printf("write(s3), ft_write(s3) = ");
-
+	
+    ssize_t glibc_res = write(1, "Hello World\n", 12);
+    ssize_t libasm_res = ft_write(1, "Hello World\n", 12);
+    printf("write(STDOUT), ft_write(STDOUT) = %zu, %zu\n", glibc_res, libasm_res);
+	glibc_res = write(2, "Hello World\n", 12);
+    libasm_res = ft_write(2, "Hello World\n", 12);
+    printf("write(STDERR), ft_write(STDERR) = %zu, %zu\n", glibc_res, libasm_res);
+    glibc_res = write(55, "Hello World\n", 12);
+    libasm_res = ft_write(55, "Hello World\n", 12);
+    printf("write(FD=55), ft_write(FD=55)   = %ld, %ld\n", glibc_res, libasm_res);
 	printf("\n");   
 }
 
@@ -119,7 +125,7 @@ int		main(void) {
 	test_strlen();
 	test_strcpy();
 	test_strcmp();
-	
+	test_write();
 
 	return (0);
 }

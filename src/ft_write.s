@@ -17,7 +17,7 @@ ft_write:							; ssize_t ft_write(int fd = rdi, const void *buf = rsi, size_t c
 		push	rbx					;	stack++;
 		neg		rax					;	res = -res;
 		mov		rbx, rax			;	*stack = res;
-		call 	__errno_location	;	char *addr = ___errno_location();
+		call 	__errno_location wrt ..plt	;	char *addr = ___errno_location();
 		mov		dword [rax], ebx	;	*addr = (int)(*stack);
 		mov		rax, -1				;	res = -1;
 		pop		rbx					;	stack--;
