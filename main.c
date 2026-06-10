@@ -119,7 +119,7 @@ void    test_write(void) {
 
     glibc_res = write(55, "Hello World\n", 12);
     libasm_res = ft_write(55, "Hello World\n", 12);
-    printf("write(FD=55), ft_write(FD=55)   = %ld, %ld\n", glibc_res, libasm_res);
+    printf("write(FD=55), ft_write(FD=55)   = %d, %d\n", glibc_res, libasm_res);
 
 	printf("\n");   
 }
@@ -148,6 +148,7 @@ void    test_read(void)
     close(pipefd[0]);
     close(pipefd[1]);
 
+
     printf("read(pipe),  ft_read(pipe)  = (%ld - %s), (%ld - %s)\n", glibc_res, glibc_buf, libasm_res, libasm_buf);
 
 
@@ -162,6 +163,15 @@ void    test_read(void)
     printf("\n");
 }
 
+
+
+extern int ft_atoi_base(char *str, char *base);
+void    test_atoi_base(void) {
+const char *base = "0123456789";
+    printf("------glibc read VS libasm ft_read -------\n\n");
+    printf("atoi(), ft_atoi() = %d, %d", atoi("-42"), ft_atoi_base("-42", "0123456789"));
+}
+
 int		main(void) {
 
 	test_strlen();
@@ -169,6 +179,7 @@ int		main(void) {
 	test_strcmp();
 	test_write();
     test_read();
+    test_atoi_base();
 	return (0);
 }
 

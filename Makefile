@@ -12,9 +12,10 @@ SRCS    	=	src/ft_strlen.s \
 				src/ft_strcpy.s \
 				src/ft_strcmp.s \
 				src/ft_write.s	\
-				src/ft_read.s
+				src/ft_read.s \
+				src/ft_atoi_base_bonus.s
 
-SRCS_BONUS	=	bonus/ft_atoi_base_bonus.s
+SRCS_BONUS	=	
 
 OBJS    	= $(SRCS:.s=.o)
 OBJS_BONUS  = $(SRCS_BONUS:.s=.o)

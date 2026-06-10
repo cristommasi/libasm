@@ -9,7 +9,6 @@ void			_is_num(void);
 void			_is_alpha(void);
 void			_check_base(void);
 void			_skip_whitespace(void);
-t_func			is_sign 		= _is_sign;
 t_func			is_whitespace	= _is_whitespace;
 t_func			in_base			= _in_base;
 t_func			is_num			= _is_num;
@@ -21,23 +20,6 @@ t_func			skip_whitespace = _skip_whitespace;
 
 ssize_t			base_values[255];
 
-
-void		_is_sign(void) {
-
-	xor(&rax, &rax);
-
-	cmp(rdi, '+');
-    if (je())
-		goto yes;
-
-	cmp(rdi, '-');
-    if (je())
-		goto yes;
-	return  ;
-	yes:
-		mov_imm(&rax, 1);
-		return  ;
-}
 
 void    	_is_whitespace(void) {
 
@@ -316,66 +298,4 @@ void		ft_atoi_base(void) {
 		mul(&r10, &r9);
 		mov_reg(&rax, &r10);
 		return ;
-}
-
-static void reset_base_values(void)
-{
-	int i;
-
-	i = 0;
-	while (i < 255)
-	{
-		base_values[i] = -1;
-		i++;
-	}
-	rdi = 0;
-	rsi = 0;
-}
-
-static void run_case(const char *str, const char *base)
-{
-	long got;
-	long expected;
-
-	reset_base_values();
-
-	rdi = (ssize_t)str;
-	rsi = (ssize_t)base;
-
-	ft_atoi_base();
-
-	got = (long)rax;
-	expected = atoi(str);
-
-	printf("str=\"%s\" base=\"%s\"\n", str, base);
-	printf("got=%ld expected=%ld\n", got, expected);
-
-	if (got != expected)
-		printf("❌ FAIL\n\n");
-	else
-		printf("✔ OK\n\n");
-}
-
-int main(void)
-{
-	run_case("0", "0123456789");
-	run_case("1", "0123456789");
-	run_case("42", "0123456789");
-	run_case("-42", "0123456789");
-	run_case("+42", "0123456789");
-	run_case("   42", "0123456789");
-	run_case("   -42", "0123456789");
-	run_case("2147483647", "0123456789");
-	run_case("-2147483648", "0123456789");
-	run_case("99999", "0123456789");
-
-	/* edge-ish inputs */
-	run_case("--42", "0123456789");
-	run_case("+-42", "0123456789");
-	run_case("42abc", "0123456789");
-	run_case("abc42", "0123456789");
-	run_case("", "0123456789");
-	run_case("-", "0123456789");
-
-	return 0;
 }
