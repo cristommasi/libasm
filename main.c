@@ -169,7 +169,6 @@ int		main(void) {
 	test_strcmp();
 	test_write();
     test_read();
-    
 	return (0);
 }
 
