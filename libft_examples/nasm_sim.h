@@ -8,6 +8,9 @@
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
+
+
 
 typedef struct s_stack {
 
@@ -52,6 +55,16 @@ static void    push(ssize_t *reg)
     node->value = *reg;
     node->next  = stack;
     stack  = node;
+}
+
+static void    call(t_func f) {
+
+    f();
+}
+
+static void    ret(void) {
+
+    return ;
 }
 
 // mov rax, rdi
@@ -130,10 +143,7 @@ static void    mul3(ssize_t *rega, ssize_t *regb, ssize_t *dest) {
     *dest = (*rega) * (*regb);
 }
 
-static void    call(t_func f) {
 
-    f();
-}
 
 static void    cmp(ssize_t a, ssize_t b) { 
 

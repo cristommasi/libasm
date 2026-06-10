@@ -6,282 +6,309 @@ void			_is_sign(void);
 void			_is_whitespace(void);
 void			_in_base(void);	
 void			_is_num(void);
-void			_is_low_alpha(void);
-void			_is_high_alpha(void);
+void			_is_alpha(void);
 void			_check_base(void);
 void			_skip_whitespace(void);
-void			_set_sign(void);
 t_func			is_sign 		= _is_sign;
 t_func			is_whitespace	= _is_whitespace;
 t_func			in_base			= _in_base;
 t_func			is_num			= _is_num;
-t_func			is_low_alpha	= _is_low_alpha;
-t_func			is_high_alpha	= _is_high_alpha;
+t_func			is_alpha		= _is_alpha;
 t_func			check_base		= _check_base;
 t_func			skip_whitespace = _skip_whitespace;
-t_func			set_sign = _set_sign;
 
 // typedefs to match behaviour -----------------------------------
 
 ssize_t			base_values[255];
-const char		*str;
-const char		*base;
+
 
 void		_is_sign(void) {
 
 	xor(&rax, &rax);
 
-	cmp(rsi, '+');
+	cmp(rdi, '+');
     if (je())
 		goto yes;
 
-	cmp(rsi, '-');
+	cmp(rdi, '-');
     if (je())
 		goto yes;
-	return ;
+	return  ;
 	yes:
 		mov_imm(&rax, 1);
-		return ;
+		return  ;
 }
 
 void    	_is_whitespace(void) {
 
     xor(&rax, &rax);
 
-    cmp(rsi, '\t');
+    cmp(rdi, '\t');
     if (je())
 		goto yes;
 
-    cmp(rsi, '\r');
+    cmp(rdi, '\r');
     if (je())
 		goto yes;
 
-    cmp(rsi, '\n');
+    cmp(rdi, '\n');
     if (je())
 		goto yes;
 
-    cmp(rsi, ' ');
+    cmp(rdi, ' ');
     if (je())
 		goto yes;
 
-    cmp(rsi, '\f');
+    cmp(rdi, '\f');
     if (je())
 		goto yes;
 
-    cmp(rsi, '\v');
+    cmp(rdi, '\v');
     if (je())
 		goto yes;
-	return ;
+	return  ;
 	yes:
     	mov_imm(&rax, 1);
-		return ;
+		return  ;
 }
 
 void		_is_num(void) {
 	
 	xor(&rax, &rax);
 
-	cmp(rsi, '0');
+	cmp(rdi, '0');
 	if (jl())
 		goto ret;
 
-	cmp(rsi, '9');
+	cmp(rdi, '9');
 	if (jg())
 		goto ret;
 
 	mov_imm(&rax, 1);
-	return ;
+	return  ; // ret 1
 	ret:
-		return ;
+		return  ; // ret 0
 }
 
-void		_is_low_alpha(void) {
+void		_is_alpha(void) {
 
 	xor(&rax, &rax);
 
-	cmp(rsi, 'a');
-	if (jl())
-		goto ret;
+	test_low_alpha:
 
-	cmp(rsi, 'z');
-	if (jg())
-		goto ret;
+		cmp(rdi, 'a');
+		if (jl())
+			goto test_high_alpha;
 
-	mov_imm(&rax, 1);
-	return ;
-	ret:
-		return ;
-}
+		cmp(rdi, 'z');
+		if (jg())
+			goto test_high_alpha;
 
-void		_is_high_alpha(void) {
+		goto yes;
+
+	test_high_alpha:
+
+		cmp(rdi, 'A');
+		if (jl())
+			goto no;
+
+		cmp(rdi, 'Z');
+		if (jg())
+			goto no;
+
+		goto yes;
 	
-	xor(&rax, &rax);
-
-	cmp(rsi, 'A');
-	if (jl())
-		goto ret;
-
-	cmp(rsi, 'Z');
-	if (jg())
-		goto ret;
-
-	mov_imm(&rax, 1);
-	return ;
-	ret:
-		return ;
+	yes:
+		mov_imm(&rax, 1);
+		return  ;
+	no:
+		return  ;
 }
 
 void		_in_base(void) {
 
 	xor(&rax, &rax);
-	cmp(base_values[rsi], -1);
+	cmp(base_values[rdi], -1);
 	if (je())
 		goto ret;
+	
 	mov_imm(&rax, 1);
+	return  ;
 	ret:
-		return ;
+		return  ;
 }
 
 void		_check_base(void) {
 
-	xor(&rsi, &rsi);
+
 	xor(&rcx, &rcx);
 	xor(&rax, &rax);
 	loop:
 
-		mov_imm(&rsi, *(base + rcx));
-		cmp(rsi, 0);
+		cmp(*((char*)rdi + rcx), 0);
 		if (je())
 			goto ret;
+		goto test_if_num;
+	
+		test_if_num:
+			push(&rcx);
+			push(&rdi);
+			mov_imm(&rdi, *((char*)rdi + rcx));
+			call(is_num);
+			pop(&rdi);
+			pop(&rcx);
+			test(rax, rax);
+			if (jnz())
+				goto test_in_base;
+			goto test_if_alpha;
 
-		call(is_num);
-		test(rax, rax);
-		if (jnz())
-			goto test_in_base;
-
-		call(is_low_alpha);
-		test(rax, rax);
-		if (jnz())
-			goto test_in_base;
-
-		call(is_high_alpha);
-		test(rax, rax);
-		if (jnz())
-			goto test_in_base;
-		
-		goto error;
-
-	test_in_base:
-		
-		call(in_base);
-		test(rax, rax);
-		if (jnz())
+		test_if_alpha:
+			push(&rcx);
+			push(&rdi);
+			mov_imm(&rdi, *((char*)rdi + rcx));
+			call(is_alpha);
+			pop(&rdi);
+			pop(&rcx);
+			test(rax, rax);
+			if (jnz())
+				goto test_in_base;
 			goto error;
-		base_values[rsi] = rcx;
-    	inc(&rcx);
-    	goto loop;
+
+		test_in_base:
+
+			push(&rcx);
+			push(&rdi);
+			mov_imm(&rdi, *((char*)rdi + rcx));
+
+			call(in_base);
+			pop(&rdi);
+			pop(&rcx);
+			test(rax, rax);
+			
+			if (jnz())
+				goto error;
+			goto assign_base_balue;
 		
+		assign_base_balue:
+			base_values[*((char*)rdi + rcx)] = rcx;
+    		inc(&rcx);
+    		goto loop;
 
 	ret:
 		cmp(rcx, 2);
 		if (jl())
 			goto error;
 		mov_reg(&rax, &rcx);
-		return ;
+		return  ;
 	
 	error:
 		mov_imm(&rax, -1);
-		return ;
+		return  ;
 }
 
 void		_skip_whitespace(void) {
 
-	goto loop;
-
+	xor(&rax, &rax);
+	mov_imm(&rcx, -1);
 	loop:
 
 		inc(&rcx);
-		mov_imm(&rsi, *(str + rcx));
-		cmp(rsi, 0);
+
+		cmp(*((char*)rdi + rcx), 0);
 		if (je())
 			goto ret;
+		
+
+		push(&rcx);
+		push(&rdi);
+		mov_imm(&rdi, *((char*)rdi + rcx));
 		call(is_whitespace);
+		pop(&rdi);
+		pop(&rcx);
 		cmp(rax, 1);
 		if (je())
 			goto loop;
+		
 		goto ret;
 
 	ret:
-		return ;
+		mov_reg(&rax, &rcx);
+		return  ;
 }
 
-void		_set_sign(void) {
-
-	goto test_pos_sign;
-
-	test_pos_sign:
-		mov_imm(&r9, 1); //int sign = 1
-		cmp(*(str + rcx), '+');
-		if (jne())
-			goto test_neg_sign;
-		inc(&rcx);
-		goto ret;
-	
-	test_neg_sign:
-		cmp(*(str + rcx), '-');
-		if (jne())
-			goto ret;
-		mov_imm(&r9, -1); //int sign = -1
-		inc(&rcx);
-		goto ret;
-	ret:
-		return ;
-}
 
 void		ft_atoi_base(void) {
 	
-	call(check_base);
-	cmp(rax, -1);
-	if (je())
-		goto error;
-	
-	mov_reg(&r8, &rax); // int base = strlen(base);
-	xor(&rax, &rax); // 0
-	xor(&r10, &r10); // 0
-	mov_imm(&rcx, -1); // int i = -1
-	
+	xor(&rax, &rax);
+	xor(&rcx, &rcx);
+	xor(&r8, &r8);
+	xor(&r9, &r9);
+	xor(&r10, &r10);
+	base:
+		push(&rdi);
+		mov_reg(&rdi, &rsi);
+		call(check_base);
+		pop(&rdi);
+		cmp(rax, -1);
+		if (je())
+			goto error;
+		mov_reg(&r8, &rax); // int base = strlen(base);
+		goto whitespace;
 
-	call(skip_whitespace);
-	call(set_sign);
+	whitespace:
+		push(&r8);
+		push(&rdi);
+		call(skip_whitespace);
+		pop(&rdi);
+		pop(&r8);
+		mov_reg(&rcx, &rax); // int i = 0;
+		xor(&r10, &r10); // int res = 0;
+		goto pos_sign;
+
+	pos_sign:
+		mov_imm(&r9, 1); //int sign = 1
+		cmp(*((char*)rdi + rcx), '+');
+		if (jne())
+			goto neg_sign;
+		inc(&rcx);
+		goto mainloop;
 	
+	neg_sign:
+		cmp(*((char*)rdi + rcx), '-');
+		if (jne())
+			goto mainloop;
+		mov_imm(&r9, -1); //int sign = -1
+		inc(&rcx);
+		goto mainloop;
+	
+	 
 	mainloop:
-	
-		mov_imm(&rsi, *(str + rcx));
-		cmp(rsi, 0);
+
+		cmp(*((char*)rdi + rcx), 0);
 		if (je())
 			goto ret;
 
+
+		push(&r8);
+		push(&r9);
+		push(&r10);
+		push(&rdi);
+		mov_imm(&rdi, *((char*)rdi + rcx));
 		call(in_base);
+		pop(&rdi);
+		pop(&r10);
+		pop(&r9);
+		pop(&r8);
 		test(rax, rax);
 		if (jz())
 			goto ret;
-
+		
 		mul(&r10, &r8);
-		add(&r10, base_values[rsi]);
+		add(&r10, base_values[*((char *)rdi + rcx)]);
 		
 		inc(&rcx);
-		cmp(r10, INT_MAX);
-		if (jg()) goto overflow;
-		cmp(r10, INT_MIN);
-		if (jl()) goto underflow;
 		goto mainloop;
 
-	overflow:
-		mov_imm(&rax, INT_MIN);
-		return ;
-	underflow:
-		mov_imm(&rax, INT_MAX);
-		return ;
 	error:
 		mov_imm(&rax, 0);
 		return ;
@@ -291,18 +318,64 @@ void		ft_atoi_base(void) {
 		return ;
 }
 
-int main(void) {
+static void reset_base_values(void)
+{
+	int i;
 
-
-	for (int i = 0; i < 255; i++) {
+	i = 0;
+	while (i < 255)
+	{
 		base_values[i] = -1;
+		i++;
 	}
+	rdi = 0;
+	rsi = 0;
+}
 
-	str = "76";
-	base = "0123456789";
+static void run_case(const char *str, const char *base)
+{
+	long got;
+	long expected;
+
+	reset_base_values();
+
+	rdi = (ssize_t)str;
+	rsi = (ssize_t)base;
+
 	ft_atoi_base();
-	printf("num  = %ld \n", rax);
-	printf("atoi = %d \n", atoi(str));
-	
+
+	got = (long)rax;
+	expected = atoi(str);
+
+	printf("str=\"%s\" base=\"%s\"\n", str, base);
+	printf("got=%ld expected=%ld\n", got, expected);
+
+	if (got != expected)
+		printf("❌ FAIL\n\n");
+	else
+		printf("✔ OK\n\n");
+}
+
+int main(void)
+{
+	run_case("0", "0123456789");
+	run_case("1", "0123456789");
+	run_case("42", "0123456789");
+	run_case("-42", "0123456789");
+	run_case("+42", "0123456789");
+	run_case("   42", "0123456789");
+	run_case("   -42", "0123456789");
+	run_case("2147483647", "0123456789");
+	run_case("-2147483648", "0123456789");
+	run_case("99999", "0123456789");
+
+	/* edge-ish inputs */
+	run_case("--42", "0123456789");
+	run_case("+-42", "0123456789");
+	run_case("42abc", "0123456789");
+	run_case("abc42", "0123456789");
+	run_case("", "0123456789");
+	run_case("-", "0123456789");
+
 	return 0;
 }
