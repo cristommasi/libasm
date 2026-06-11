@@ -119,8 +119,7 @@ void    test_write(void) {
 
     glibc_res = write(55, "Hello World\n", 12);
     libasm_res = ft_write(55, "Hello World\n", 12);
-    printf("write(FD=55), ft_write(FD=55)   = %d, %d\n", glibc_res, libasm_res);
-
+    printf("write(FD=55), ft_write(FD=55)   = %ld, %ld\n", glibc_res, libasm_res);
 	printf("\n");   
 }
 
@@ -164,22 +163,58 @@ void    test_read(void)
 }
 
 
-
 extern int ft_atoi_base(char *str, char *base);
-void    test_atoi_base(void) {
-const char *base = "0123456789";
-    printf("------glibc read VS libasm ft_read -------\n\n");
-    printf("atoi(), ft_atoi() = %d, %d", atoi("-42"), ft_atoi_base("-42", "0123456789"));
+void	test_atoi_base(void)
+{
+	char *base10 = "0123456789";
+	char *base2 = "01";
+	char *base8 = "01234567";
+	char *base16 = "0123456789abcdef";
+	char *base36 = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+	char *num1 = "";
+	char *num2 = "-2147483648";
+	char *num3 = "   +42";
+	char *num4 = "\t\n\v\f\r-42";
+	char *num5 = "+--++42";
+	char *num6 = "42abc";
+	char *num7 = "101010";
+	char *num8 = "2a";
+	char *num9 = "7fffffff";
+	char *num10 = "-80000000";
+
+
+	printf("------ atoi & strtol VS ft_atoi_base -------\n\n");
+
+	printf("empty string                     = %d, %d\n", atoi(num1), ft_atoi_base(num1, base10));
+	printf("INT_MIN                          = %d, %d\n", atoi(num2), ft_atoi_base(num2, base10));
+	printf("spaces + 42                      = %d, %d\n", atoi(num3), ft_atoi_base(num3, base10));
+	printf("all whitespace + -42             = %d, %d\n", atoi(num4), ft_atoi_base(num4, base10));
+	printf("invalid sign sequence            = %d, %d\n", atoi(num5), ft_atoi_base(num5, base10));
+	printf("stop at letters                  = %d, %d\n", atoi(num6), ft_atoi_base(num6, base10));
+	printf("binary 101010                    = %d, %d\n", (int)strtol(num7, NULL, 2), ft_atoi_base(num7, base2));
+	printf("hex 2a                           = %d, %d\n", (int)strtol(num8, NULL, 16), ft_atoi_base(num8, base16));
+	printf("hex max int (lowercase input)    = %d, %d\n", (int)strtol("7fffffff", NULL, 16), ft_atoi_base(num9, base16));
+	printf("hex min int (negative style)     = %d, %d\n", (int)strtol("-80000000", NULL, 16), ft_atoi_base(num10, base16));
+    printf("octal 52                         = %d, %d\n", (int)strtol("52", NULL, 8), ft_atoi_base("52", base8));
+    printf("octal max int                    = %d, %d\n", (int)strtol("17777777777", NULL, 8), ft_atoi_base("17777777777", base8));
+    printf("octal zero                       = %d, %d\n", (int)strtol("0", NULL, 8), ft_atoi_base("0", base8));
+    printf("octal invalid stops at 8         = %d, %d\n", (int)strtol("12345877", NULL, 8), ft_atoi_base("12345877", base8));
+    printf("base36 16                        = %d, %d\n", (int)strtol("16", NULL, 36), ft_atoi_base("16", base36));
+    printf("base36 z                         = %d, %d\n", (int)strtol("z", NULL, 36), ft_atoi_base("z", base36));
+    printf("base36 10z                       = %d, %d\n", (int)strtol("10z", NULL, 36), ft_atoi_base("10z", base36));
+    printf("base36 big number                = %d, %d\n", (int)strtol("1z141z3", NULL, 36), ft_atoi_base("1z141z3", base36));
+
 }
 
-int		main(void) {
-
-	test_strlen();
-	test_strcpy();
-	test_strcmp();
-	test_write();
+int	main(void)
+{
+    test_strlen();
+    test_strcpy();
+    test_strcmp();
+    test_write();
     test_read();
-    test_atoi_base();
+	test_atoi_base();
 	return (0);
 }
 

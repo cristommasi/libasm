@@ -1,271 +1,340 @@
-TAB_ASCII equ 9
-NEWLINE_ASCII equ 10
-VERT_TAB_ASCII equ 11
-F_FEED_ASCII equ 12
-CAR_RET_ASCII equ 13
-SPACE_ASCII equ 32
-PLUS_ASCII equ 43
-MINUS_ASCII equ 45
 
-section .bss
-    base_values resq 255
 
 section .text
     global ft_atoi_base
 
+get_sign:
 
+    .prologue:
+       push    rbp
+       mov     rbp, rsp
+       push    rbx
+       push    r12
+
+    .init:
+        mov     r12, rdi
+        xor     rbx, rbx
+        mov     rax, 1
+
+    .compare:
+        movzx   rdi, byte [r12]
+        cmp     dil, 43 ; '+'
+        je      .positive
+        cmp     dil, 45 ; '-'
+        je      .negative
+        jmp     .epilogue
+
+    .positive:
+        mov     rax, 1
+        inc     rbx
+        jmp     .epilogue
+
+    .negative:
+        mov     rax, -1
+        inc     rbx
+    
+    .epilogue:
+        mov     rdx, rbx
+        pop     r12
+        pop     rbx
+        pop     rbp
+        ret
+        
+;------------------------------------------
+;------------------------------------------
 is_whitespace:
 
-    xor     rax, rax
-
-    cmp     rdi, TAB_ASCII
-    je      .yes
-    cmp     rdi, NEWLINE_ASCII
-    je      .yes
-    cmp     rdi, VERT_TAB_ASCII
-    je      .yes
-    cmp     rdi, F_FEED_ASCII
-    je      .yes
-    cmp     rdi, CAR_RET_ASCII
-    je      .yes
-    cmp     rdi, SPACE_ASCII
-    je      .yes
-
-    ret
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+    .init:
+        xor     rax, rax
+    .compare:
+        cmp     edi, 9  ; '/t'
+        je      .yes
+        cmp     edi, 10 ; '/n' 
+        je      .yes
+        cmp     edi, 11 ; '/v'
+        je      .yes
+        cmp     edi, 12 ; '/f'
+        je      .yes
+        cmp     edi, 13 ; '/r'
+        je      .yes
+        cmp     edi, 32 ; ' '
+        je      .yes
+        jmp     .epilogue
 
     .yes:
         mov     rax, 1
+    .epilogue:
+        pop     rbp
         ret
-
-
+;------------------------------------------
+;------------------------------------------
 is_num:
 
-    xor     rax, rax
-    cmp     rdi, '0'
-    jl      .no
-    cmp     rdi, '9'
-    jg      .no
-    jmp     .yes
-
-    .yes:
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+    .init:
+        xor     rax, rax
+    .check:
+        cmp     rdi, 48 ; '0'
+        jl      .epilogue
+        cmp     rdi, 57 ; '9'
+        jg      .epilogue
         mov     rax, 1
+    .epilogue:
+        pop rbp
         ret
-
-    .no:
-        ret
-
+;------------------------------------------
+;------------------------------------------
 is_alpha:
 
-    xor     rax, rax
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+    .init:
+        xor     rax, rax
     
     .test_low_alpha:
-
-        cmp     rdi, 'a'
+        cmp     rdi, 97 ; 'a'
         jl      .test_high_alpha
-        cmp     rdi, 'z'
+        cmp     rdi, 122 ; 'z'
         jg      .test_high_alpha
-        jmp     .yes
+        mov     rax, 1
+        jmp     .epilogue
 
     .test_high_alpha:
 
-        cmp     rdi, 'A'
-        jl      .no
-        cmp     rdi, 'Z'
-        jg      .no
-        jmp     .yes
-    
-    .yes:
+        cmp     rdi, 65 ; 'A'
+        jl      .epilogue
+        cmp     rdi, 90 ; 'Z'
+        jg      .epilogue
         mov     rax, 1
-        ret
-    
-    .no:
-        ret
 
+    .epilogue:
+        pop rbp
+        ret
+;------------------------------------------
+;------------------------------------------
 in_base:
+
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+
+    .init:
+        xor     rax, rax
+
+    .compare:
+        cmp     qword [rsi + rdi*8], -1
+        je      .epilogue
+        mov     rax, 1
     
-    xor     rax, rax
-    cmp     qword [base_values + rdi*8], -1
-    je      .ret
-    mov     rax, 1
-
-    .ret:
+    .epilogue:
+        pop rbp
         ret
+;------------------------------------------
+;------------------------------------------
+skip_whitespace:
 
-check_base:
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        push    r12
 
-    xor     rax, rax
-	xor     rcx, rcx
+    .init:
+        xor     rbx, rbx ; int i
+        mov     r12, rdi ; char *str
+        xor     rax, rax
 
     .loop:
 
-        mov     al, [rdi + rcx]
-        cmp     al, 0
+        movzx   rdi, byte [r12 + rbx]
+        cmp     byte [r12 + rbx], 0
+        je      .epilogue
+
+        .test_whitespace:
+
+            call    is_whitespace
+            test    rax, rax
+            jz      .epilogue
+            
+        inc     rbx
+        jmp     .loop
+       
+    .epilogue:
+        mov     rax, rbx
+        pop     r12
+        pop     rbx
+        pop     rbp
+        ret
+;------------------------------------------
+;------------------------------------------
+get_base:
+
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+        push    r15
+        push    r14
+        push    r13
+        push    r12
+        
+    
+    .init:
+        mov     r12, rsi    ; size_t base_values[256]
+        mov     r13, rdi    ; char *base
+        mov     r15, 0      ; int i = 0
+        mov     r14, 0      ; char c = base[i]
+
+    .loop:
+
+        movzx   r14, byte [r13 + r15]
+        cmp     r14, 0
         je      .ret
-        jmp     .test_if_num
 
         .test_if_num:
-            push    rdi
-            push    rcx
-            movzx   rdi, al
+            
+            mov     rdi, r14
             call    is_num
-            pop     rcx
-            pop     rdi
             test    rax, rax
             jnz     .test_in_base
-            jmp     .test_if_alpha
-
         
         .test_if_alpha:
-            push    rdi
-            push    rcx
-            movzx   rdi, al
+            
+            mov     rdi, r14
             call    is_alpha
-            pop     rcx
-            pop     rdi
             test    rax, rax
             jnz     .test_in_base
             jmp     .error
         
         .test_in_base:
-            push    rdi
-            push    rcx
-            movzx   rdi, al
+            mov     rdi, r14
+            mov     rsi, r12
             call    in_base
-            pop     rcx
-            pop     rdi
             test    rax, rax
-            jnz     .error
-            jmp     .assign_base_value     
+            jnz     .error 
 
         .assign_base_value:
-            movzx   rbx, al
-            mov     qword [base_values + rbx*8], rcx
-            inc     rcx
+            mov     qword [r12 + r14*8], r15 ; base_value[base[i]] = i
+            inc     r15
             jmp     .loop
-   
+
     .ret:
-        cmp     rcx, 2
+        mov     rax, r15
+        cmp     rax, 2
         jl      .error
-        mov     rax, rcx
-        ret
+        jmp     .epilogue
 
     .error:
         mov     rax, -1
+
+    .epilogue:
+        pop     r12
+        pop     r13
+        pop     r14
+        pop     r15
+        pop     rbp
         ret
 
+    
+;------------------------------------------
+;------------------------------------------
+init_base_values:
 
-skip_whitespace:
-
-    xor     rax, rax
-    mov     rcx, -1
-
-    .loop:
-
-        inc     rcx
-        mov     al, [rdi + rcx]
-        jmp     .test_null
-
-        .test_null:
-            
-            cmp     al, 0
-            je      .ret
-            jmp     .test_whitespace
-
-        .test_whitespace:
-
-            push    rcx
-            push    rdi
-            movzx   rdi, al
-            call    is_whitespace
-            pop     rdi
-            pop     rcx
-            cmp     rax, 1
-            je      .loop
-        
-        jmp     .ret
-       
-    .ret:
-        mov     rax, rcx
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+    .init:
+        mov     rcx, 256
+    .fill:
+        mov     qword [rdi + rcx*8 - 8], -1
+        dec     rcx
+        jnz     .fill
+    .epilogue:
+        pop     rbp
         ret
 
+;------------------------------------------
+;------------------------------------------
 ft_atoi_base:
 
-	xor     rax, rax
-	xor     rcx, rcx
-	xor     r8, r8
-	xor     r9, r9
-	xor     r10, r10
+    .prologue:
+        push    rbp
+        mov     rbp, rsp
+        push    r15        ; int sign
+        push    r14        ; int res
+        push    r13        ; char *base / base_len
+        push    r12        ; char *str
+        sub     rsp, 256*8 ; size_t base_values[256]
+
+    .init:
+        mov     r15, 1
+        mov     r14, 0
+        mov     r13, rsi
+        mov     r12, rdi
+        xor     rbx, rbx
+        mov     rdi, rsp
+        call    init_base_values ; init_base_values(char base_values[255])
 
     .base:
 
-        push    rdi
-        mov     rdi, rsi
-        call    check_base
-        pop     rdi
+        mov     rdi, r13
+        mov     rsi, rsp
+        call    get_base ; get_base(char *base, char base_values[255])
         cmp     rax, -1
         je      .error
-        mov     r8, rax
-        jmp     .whitespace
+        mov     r13, rax ; base_len = x
 
     .whitespace:
-        push    r8
-        push    rdi
-        call    skip_whitespace
-        pop     rdi
-        pop     r8
-        mov     rcx, rax
-        xor     r10, r10
-        jmp     .pos_sign
+        mov     rdi, r12
+        call    skip_whitespace ; skip_whitespace(char *str)
+        add     r12, rax ; str + rax OR str[i + rax]
+        
 
-    .pos_sign:
-        mov     r9, 1
-        mov     al, [rdi + rcx]
-        cmp     al, PLUS_ASCII
-        jne     .neg_sign
-        inc     rcx
-        jmp     .mainloop
-
-    .neg_sign:
-        cmp     al, MINUS_ASCII
-        jne     .mainloop
-        mov     r9, -1
-        inc     rcx
-        jmp     .mainloop
+    .sign:
+        mov     rdi, r12
+        call    get_sign ; get_sign(char *str)
+        mov     r15, rax ; sign = rax
+        add     r12, rdx ; str + rbx
+        xor     rbx, rbx
 
     .mainloop:
 
-        mov     al, [rdi + rcx]
-        cmp     al, 0
-        je      .ret
-        jmp     .check_in_base
-
-
-        .check_in_base:
-            push    r8
-            push    r9
-            push    r10
-            push    rdi
-            movzx   rdi, al
-            call    in_base
-            pop     rdi
-            pop     r10
-            pop     r9
-            pop     r8
-            test    rax, rax
-            jz      .ret
+        movzx   rdi, byte [r12 + rbx]
+        cmp     byte [r12 + rbx], 0
+        je      .epilogue
         
-        imul    r10, r8
-        movzx   rbx, al
-        add     r10, qword [base_values + rbx*8]
-        inc     rcx
+        .check_in_base:
+
+            mov     rsi, rsp
+            call    in_base
+            test    rax, rax
+            jz      .epilogue
+        
+        imul    r14, r13
+        movzx   rdi, byte [r12 + rbx]
+        add     r14, qword [rsp + rdi*8]
+        inc     rbx
         jmp     .mainloop
 
 
     .error:
-        mov     rax, 0
-        ret
+        mov     r14, 0
+        jmp     .epilogue
 
-    .ret:
-        imul    r10, r9
-        mov     rax, r10
+    .epilogue:
+        imul    r14, r15
+        mov     eax, r14d
+        add     rsp, 256*8 ; size_t base_values[256]
+        pop     r12
+        pop     r13
+        pop     r14
+        pop     r15
+        pop     rbp
         ret
+;------------------------------------------
+;------------------------------------------
