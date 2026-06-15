@@ -235,6 +235,36 @@
 
 // }
 
+extern char *ft_strdup(char *s);
+void        test_strdup(void) {
+
+    char *s1      = "hello world";
+    char s2[12]   = "hello world";
+    char *s3      = "";
+
+    char *ft1 = ft_strdup(s1);
+    char *ft2 = ft_strdup(s2);
+    char *ft3 = ft_strdup(s3);
+
+    char *r1 = strdup(s1);
+    char *r2 = strdup(s2);
+    char *r3 = strdup(s3);
+
+    printf("------glibc strdup VS libasm ft_strdup-------\n\n");
+    printf("char *s1    = \"hello world\";\nchar s2[12] = \"hello world\";\nchar *s3    = \"\";\n\n");
+    printf("strdup(s1), ft_strdup(s1) = %s, %s\n", r1, ft1);
+    printf("strdup(s2), ft_strdup(s2) = %s, %s\n", r2, ft2);
+    printf("strdup(s3), ft_strdup(s3) = %s, %s\n", r3, ft3);
+    printf("\n");
+
+    free(ft1);
+    free(ft2);
+    free(ft3);
+    free(r1);
+    free(r2);
+    free(r3);  
+}
+
 int	main(void)
 {
     // test_strlen();
@@ -243,7 +273,8 @@ int	main(void)
     // test_write();
     // test_read();
 	// test_atoi_base();
-    test_strdup();
+    // test_strdup();
+    char *s1 = ft_strdup("");
 	return (0);
 }
 

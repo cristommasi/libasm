@@ -7,11 +7,17 @@
 
 ;--------------------------------------------------------------------------------------------------DEC-VARS
 
-%macro stackenter 0 
+%macro stack_enter 0 
     push rbp
     mov  rbp, rsp
     %assign _var_offset 0
 %endmacro
+
+%macro stack_alloc 0
+    %assign _padded ((_var_offset + 15) / 16) * 16
+    sub  rsp, _padded
+%endmacro
+
 
 %macro stack_leave 0
     mov  rsp, rbp
@@ -19,96 +25,60 @@
     ret
 %endmacro
 
-%macro stackalloc 0
-    sub  rsp, _var_offset
-%endmacro
 
 ;--------------------------------------------------------------------------------------------------DEC-VARS
 ; Declare vars of %1=name, 
-%macro var_u64 1
+%macro stack_u64 1
     %assign _var_offset _var_offset + 8
     %assign _%1_off _var_offset
     %define %1 qword [rbp - _%1_off]
 %endmacro
 
-%macro var_u32 1
+%macro stack_u32 1
     %assign _var_offset _var_offset + 8
     %assign _%1_off _var_offset
     %define %1 dword [rbp - _%1_off]
 %endmacro
 
-%macro var_u16 1
+%macro stack_u16 1
     %assign _var_offset _var_offset + 8
     %assign _%1_off _var_offset
     %define %1 word [rbp - _%1_off]
 %endmacro
 
-%macro var_u8 1
+%macro stack_u8 1
     %assign _var_offset _var_offset + 8
     %assign _%1_off _var_offset
     %define %1 byte [rbp - _%1_off]
 %endmacro
 
-%macro var_ptr 1
-    %assign _var_offset _var_offset + 8
-    %assign _%1_off _var_offset
-    %define %1 qword [rbp - _%1_off]
-%endmacro
-
-
 ;--------------------------------------------------------------------------------------------------DEC-VARS
 
 
-
-;--------------------------------------------------------------------------------------------------SET-VALUES
-; Set value of of %1=name, %2=value/reg
-%macro set_u64 2
-    mov  rax, %2
-    mov  %1,  rax
-%endmacro
-
-%macro set_u32 2
-    mov  %1, %2
-%endmacro
-
-%macro set_u16 2
-    mov  %1, %2
-%endmacro
-
-%macro set_u8 2
-    mov  %1, %2
-%endmacro
-
-%macro set_ptr 2
-    lea  rax, [rel %2]
-    mov  %1,  rax
-%endmacro
-;--------------------------------------------------------------------------------------------------SET-VALUES
-
 ;--------------------------------------------------------------------------------------------------ARRAYS
 ; Declare an array of %1=name, %2=count
-%macro arr_u64 2
+%macro stack_arr_u64 2
     %assign _arr_bytes _align8(%2 * 8)
     %assign _var_offset _var_offset + _arr_bytes
     %assign _%1_off _var_offset
     %define %1 rbp - _%1_off
 %endmacro
 
-%macro arr_u32 2
+%macro stack_arr_u32 2
     %assign _arr_bytes _align8(%2 * 4)
     %assign _var_offset _var_offset + _arr_bytes
     %assign _%1_off _var_offset
     %define %1 rbp - _%1_off
 %endmacro
 
-%macro arr_u16 2
+%macro stack_arr_u16 2
     %assign _arr_bytes _align8(%2 * 2)
     %assign _var_offset _var_offset + _arr_bytes
     %assign _%1_off _var_offset
     %define %1 rbp - _%1_off
 %endmacro
 
-%macro arr_u8 2
+%macro stack_arr_u8 2
     %assign _arr_bytes _align8(%2 * 1)
     %assign _var_offset _var_offset + _arr_bytes
     %assign _%1_off _var_offset

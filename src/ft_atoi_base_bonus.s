@@ -18,13 +18,13 @@ init_base_values:
 ;------------------------------------------
 ft_atoi_base:
     
-    stackenter
-    var_u64     string              ; char *str
-    var_u64     base                ; char *base / base_len
-    var_u64     sign                ; int sign
-    var_u64     res                 ; int res
-    arr_u64     base_values, 256    ; size_t base_values[256]
-    stackalloc
+    stack_enter
+    stack_u64       string              ; char *str
+    stack_u64       base                ; char *base / base_len
+    stack_u64       sign                ; int sign
+    stack_u64       res                 ; int res
+    stack_arr_u64   base_values, 256    ; size_t base_values[256]
+    stack_alloc
 
 
     .check_null:
@@ -34,12 +34,12 @@ ft_atoi_base:
         jz .error
 
     .init:
-        set_u64     string, rdi
-        set_u64     base, rsi
-        set_u64     sign, 1
-        set_u64     res, 0
-        lea         rdi, [base_values]
-        call        init_base_values ; init_base_values(char base_values[255])
+        mov     string, rdi
+        mov     base, rsi
+        mov     sign, 1
+        mov     res, 0
+        lea     rdi, [base_values]
+        call    init_base_values ; init_base_values(char base_values[255])
 
     .base:
         mov     rdi, base
@@ -47,7 +47,7 @@ ft_atoi_base:
         call    get_base ; get_base(char *base, char base_values[255])
         cmp     rax, -1
         je      .error
-        set_u64 base, rax ; base_len = x ; pre r13
+        mov     base, rax ; base_len = x ; pre r13
 
 
     .whitespace:
@@ -55,15 +55,15 @@ ft_atoi_base:
         call    skip_whitespace ; skip_whitespace(char *str)
         mov     rdx, string
         add     rdx, rax
-        set_u64 string, rdx ; str + rax OR str[i + rax]
+        mov     string, rdx ; str + rax OR str[i + rax]
 
     .sign:
         mov     rdi, string
         call    get_sign ; get_sign(char *str)
-        set_u64 sign, rax
+        mov     sign, rax
         mov     rax, string 
         add     rax, rdx
-        set_u64 string, rax
+        mov     string, rax
         
 
     xor     rcx, rcx ; int i
@@ -73,7 +73,7 @@ ft_atoi_base:
 
         movzx   rdx, byte [r8 + rcx]
         test    dl, dl
-        je      .return
+        jz      .return
         
         .check_in_base:
             mov     rdi, rdx
@@ -104,15 +104,15 @@ ft_atoi_base:
 ;------------------------------------------
 get_base:
 
-    stackenter
-    var_u64     base_values_ptr      ; size_t base_values[256]
-    var_u64     base_ptr             ; char *base                
-    stackalloc
+    stack_enter
+    stack_u64     base_values_ptr      ; size_t base_values[256]
+    stack_u64     base_ptr             ; char *base                
+    stack_alloc
     
 
     .init:
-        set_u64     base_values_ptr, rsi
-        set_u64     base_ptr,        rdi
+        mov         base_values_ptr, rsi
+        mov         base_ptr,        rdi
         mov         r8, base_ptr
         mov         r9, base_values_ptr
         mov         r10, 0              ; int i
