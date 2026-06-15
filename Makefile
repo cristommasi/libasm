@@ -14,7 +14,8 @@ SRCS    	=	src/ft_strlen.s \
 				src/ft_write.s	\
 				src/ft_read.s \
 				src/ft_strdup.s \
-				src/ft_atoi_base_bonus.s
+				src/ft_atoi_base_bonus.s \
+				src/ft_list_push_front_bonus.s
 
 SRCS_BONUS	=	
 

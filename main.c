@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
+
 extern size_t	ft_strlen(char const *s);
 void	test_strlen(void) {
 
@@ -22,7 +23,6 @@ void	test_strlen(void) {
 
 	printf("\n");
 }
-
 
 extern char *ft_strcpy(char *dest, const char *src);
 void    test_strcpy(void) {
@@ -57,7 +57,6 @@ void    test_strcpy(void) {
 
     printf("\n");
 }
-
 
 extern int ft_strcmp(const char *s1, const char *s2);
 void    test_strcmp(void) {
@@ -100,7 +99,6 @@ void    test_strcmp(void) {
 
 	printf("\n");
 }
-
 
 extern ssize_t ft_write(int fd, const void *buf, size_t count);
 void    test_write(void) {
@@ -161,7 +159,6 @@ void    test_read(void)
     printf("read(FD=55), ft_read(FD=55) = (%ld - errno %d), (%ld - errno %d)\n", glibc_res, temp1, libasm_res, temp2);
     printf("\n");
 }
-
 
 extern int ft_atoi_base(char *str, char *base);
 void	test_atoi_base(void)
@@ -265,15 +262,43 @@ void        test_strdup(void) {
     free(r3);  
 }
 
+
+typedef struct s_list
+{
+    void *data;
+    struct s_list *next;
+
+}               t_list;
+
+extern void ft_list_push_front(t_list **begin_list, void *data);
+void        test_list_push_front(void) {
+
+    t_list *head = malloc(sizeof(t_list));
+    head->data = malloc(sizeof(size_t));
+    *(size_t *)head->data = 69;
+    head->next = NULL;
+
+    printf("PRE   node head = %zu\n", *(size_t *)head->data);
+    void *data2 = malloc(sizeof(size_t));
+    *(size_t *)data2 = 420;
+
+    ft_list_push_front(&head, data2);
+
+    printf("AFTER node head = %zu\n", *(size_t *)head->data);
+    printf("AFTER node next = %zu\n", *(size_t *)head->next->data);
+}
+
+
 int	main(void)
 {
-    test_strlen();
-    test_strcpy();
-    test_strcmp();
-    test_write();
-    test_read();
-	test_atoi_base();
-    test_strdup();
+    // test_strlen();
+    // test_strcpy();
+    // test_strcmp();
+    // test_write();
+    // test_read();
+	// test_atoi_base();
+    // test_strdup();
+    test_list_push_front();
 	return (0);
 }
 

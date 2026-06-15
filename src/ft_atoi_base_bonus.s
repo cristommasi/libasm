@@ -26,7 +26,6 @@ ft_atoi_base:
     stack_arr_u64   base_values, 256    ; size_t base_values[256]
     stack_alloc
 
-
     .check_null:
         test rdi, rdi
         jz  .error
