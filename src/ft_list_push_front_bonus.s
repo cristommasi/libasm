@@ -7,26 +7,28 @@ section .text
 ft_list_push_front:
 
     stack_enter
-    push rdi
-    push rsi
+    stack_u64   begin_list
+    stack_u64   data
+    stack_alloc
+
+
+    mov begin_list, rdi
+    mov data, rsi
 
     .alloc:
         mov     rdi, 16             
         call    malloc wrt ..plt
         test    rax, rax
-        jz      .error
+        jz     .return
     
     .assign:
-        pop     rsi
-        pop     rdi
+        mov     rdi, begin_list
+        mov     rsi, data
         mov     rcx, [rdi]
         mov     [rax + S_INFO.data], rsi
         mov     [rax + S_INFO.next], rcx
         mov     [rdi], rax
-        ret
 
-    .error:
-        pop     rsi
-        pop     rdi
-        ret
-        
+
+    .return
+        stack_leave
