@@ -99,7 +99,7 @@ ft_atoi_base:
     .return:
         imul    r9, sign
         mov     eax, r9d
-        STACK_LEAVE
+        stack_leave
 ;------------------------------------------
 ;------------------------------------------
 get_base:
@@ -157,7 +157,7 @@ get_base:
         mov     rax, -1
 
     .return:
-        STACK_LEAVE
+        stack_leave
 ;------------------------------------------
 ;------------------------------------------
 skip_whitespace:

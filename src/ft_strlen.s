@@ -11,6 +11,7 @@ ft_strlen:							; size_t ft_strlen(const char *s) {
 		je      .break             	;			break 
 		inc     rax                 ;		i++
 		jmp     .loop               ;	}
+									;
 	.break:							;
 		ret                         ;	return (i)
 									; }

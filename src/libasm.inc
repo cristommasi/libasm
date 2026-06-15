@@ -13,7 +13,7 @@
     %assign _var_offset 0
 %endmacro
 
-%macro STACK_LEAVE 0
+%macro stack_leave 0
     mov  rsp, rbp
     pop  rbp
     ret
@@ -67,19 +67,19 @@
     mov  %1,  rax
 %endmacro
 
-%macro mov_u32 2
+%macro set_u32 2
     mov  %1, %2
 %endmacro
 
-%macro mov_u16 2
+%macro set_u16 2
     mov  %1, %2
 %endmacro
 
-%macro mov_u8 2
+%macro set_u8 2
     mov  %1, %2
 %endmacro
 
-%macro mov_ptr 2
+%macro set_ptr 2
     lea  rax, [rel %2]
     mov  %1,  rax
 %endmacro
