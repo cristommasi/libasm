@@ -7,7 +7,7 @@
 
 ;--------------------------------------------------------------------------------------------------DEC-VARS
 
-%macro STACK_ENTER 0 
+%macro stackenter 0 
     push rbp
     mov  rbp, rsp
     %assign _var_offset 0
@@ -19,7 +19,7 @@
     ret
 %endmacro
 
-%macro STACK_ALLOC 0
+%macro stackalloc 0
     sub  rsp, _var_offset
 %endmacro
 
@@ -62,7 +62,7 @@
 
 ;--------------------------------------------------------------------------------------------------SET-VALUES
 ; Set value of of %1=name, %2=value/reg
-%macro mov_u64 2
+%macro set_u64 2
     mov  rax, %2
     mov  %1,  rax
 %endmacro

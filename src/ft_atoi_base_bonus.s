@@ -5,7 +5,6 @@ section .text
 
 init_base_values:
 
-    STACK_ENTER
     mov     r10, 256
     
     .fill:
@@ -14,26 +13,31 @@ init_base_values:
         test    r10, r10
         jnz     .fill
         
-    .return:
-        STACK_LEAVE
+    ret
 ;------------------------------------------
 ;------------------------------------------
 ft_atoi_base:
-
-    STACK_ENTER
+    
+    stackenter
     var_u64     string              ; char *str
     var_u64     base                ; char *base / base_len
     var_u64     sign                ; int sign
     var_u64     res                 ; int res
     arr_u64     base_values, 256    ; size_t base_values[256]
-    STACK_ALLOC
+    stackalloc
 
+
+    .check_null:
+        test rdi, rdi
+        jz  .error
+        test rsi, rsi
+        jz .error
 
     .init:
-        mov_u64     string, rdi
-        mov_u64     base, rsi
-        mov_u64     sign, 1
-        mov_u64     res, 0
+        set_u64     string, rdi
+        set_u64     base, rsi
+        set_u64     sign, 1
+        set_u64     res, 0
         lea         rdi, [base_values]
         call        init_base_values ; init_base_values(char base_values[255])
 
@@ -43,7 +47,7 @@ ft_atoi_base:
         call    get_base ; get_base(char *base, char base_values[255])
         cmp     rax, -1
         je      .error
-        mov_u64 base, rax ; base_len = x ; pre r13
+        set_u64 base, rax ; base_len = x ; pre r13
 
 
     .whitespace:
@@ -51,20 +55,20 @@ ft_atoi_base:
         call    skip_whitespace ; skip_whitespace(char *str)
         mov     rdx, string
         add     rdx, rax
-        mov_u64 string, rdx ; str + rax OR str[i + rax]
+        set_u64 string, rdx ; str + rax OR str[i + rax]
 
     .sign:
         mov     rdi, string
         call    get_sign ; get_sign(char *str)
-        mov_u64 sign, rax
+        set_u64 sign, rax
         mov     rax, string 
         add     rax, rdx
-        mov_u64 string, rax
+        set_u64 string, rax
         
 
-    xor     rcx, rcx
+    xor     rcx, rcx ; int i
     mov     r8, string
-    xor     r9, r9
+    xor     r9, r9 ; res
     .mainloop:
 
         movzx   rdx, byte [r8 + rcx]
@@ -77,10 +81,13 @@ ft_atoi_base:
             mov     rax, qword [rsi + rdi*8]
             cmp     rax, -1
             je      .return
-        
+
         .add_up:
-            imul    r9, base
-            add     r9, rax   
+            imul    r9, base ; res *= base_len
+            jo      .error
+            add     r9, rax  ; res += base[i]
+            jo      .error
+
 
         inc     rcx
         jmp     .mainloop
@@ -97,26 +104,21 @@ ft_atoi_base:
 ;------------------------------------------
 get_base:
 
-    STACK_ENTER
+    stackenter
     var_u64     base_values_ptr      ; size_t base_values[256]
     var_u64     base_ptr             ; char *base                
-    STACK_ALLOC
+    stackalloc
     
-    .check_null:
-        test rdi, rdi
-        jz  .error
-        test rsi, rsi
-        jz .error
+
     .init:
-        mov_u64     base_values_ptr, rsi
-        mov_u64     base_ptr,        rdi
+        set_u64     base_values_ptr, rsi
+        set_u64     base_ptr,        rdi
         mov         r8, base_ptr
         mov         r9, base_values_ptr
         mov         r10, 0              ; int i
         mov         r11, 0              ; char c = base[i]
 
     .loop:
-
         mov     rax, base_ptr ; rax = base
         movzx   r11, byte [rax + r10] ; r11 = base[i]
         cmp     r11, 0
@@ -160,11 +162,9 @@ get_base:
 ;------------------------------------------
 skip_whitespace:
 
-    .prologue:
-        STACK_ENTER
-        mov     r8, rdi   ; char *str
-        xor     r9, r9    ; char c
-        xor     rcx, rcx  ; int i
+    mov     r8, rdi   ; char *str
+    xor     r9, r9    ; char c
+    xor     rcx, rcx  ; int i
 
     .loop:
 
@@ -184,15 +184,11 @@ skip_whitespace:
        
     .return:
         mov rax, rcx
-        STACK_LEAVE
-
-
-
+        ret
 ;------------------------------------------
 ;------------------------------------------
 get_sign:
 
-    STACK_ENTER
     xor     rdx, rdx
 
     .compare:
@@ -214,12 +210,11 @@ get_sign:
         mov     rdx, 1
 
     .return:
-        STACK_LEAVE
+        ret
 ;------------------------------------------
 ;------------------------------------------
 is_whitespace:
 
-    STACK_ENTER
     xor     rax, rax
 
     .compare:
@@ -240,12 +235,11 @@ is_whitespace:
     .yes:
         mov     rax, 1
     .return:
-        STACK_LEAVE
+        ret
 ;------------------------------------------
 ;------------------------------------------
 is_num:
 
-    STACK_ENTER
     xor     rax, rax
 
     .check:
@@ -256,12 +250,11 @@ is_num:
         mov     rax, 1
 
     .return:
-        STACK_LEAVE
+        ret
 ;------------------------------------------
 ;------------------------------------------
 is_alpha:
 
-    STACK_ENTER
     xor     rax, rax
     
     .test_low_alpha:
@@ -281,4 +274,4 @@ is_alpha:
         mov     rax, 1
 
     .return:
-        STACK_LEAVE
+        ret
