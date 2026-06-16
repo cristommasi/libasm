@@ -1,59 +1,62 @@
-
 NAME        = libasm.a
 
 NCC			= nasm
-ASMFLAGS	= -f elf64
+ASMFLAGS	= -f elf64 -Istandard/inc -Ibonus/inc
+
 CC			= gcc
 CFLAGS		= -Wall -Wextra
+
+AR			= ar rcs
 RM			= rm -f
 
 
-SRCS    	=	src/ft_strlen.s \
-				src/ft_strcpy.s \
-				src/ft_strcmp.s \
-				src/ft_write.s	\
-				src/ft_read.s \
-				src/ft_strdup.s \
-				src/ft_atoi_base_bonus.s \
-				src/ft_list_push_front_bonus.s
+STD_SRCS	= standard/src/ft_strlen.s \
+			  standard/src/ft_strcpy.s \
+			  standard/src/ft_strcmp.s \
+			  standard/src/ft_write.s	\
+			  standard/src/ft_read.s \
+			  standard/src/ft_strdup.s
 
-SRCS_BONUS	=	
+STD_OBJS    = $(STD_SRCS:.s=.o)
 
-OBJS    	= $(SRCS:.s=.o)
-OBJS_BONUS  = $(SRCS_BONUS:.s=.o)
+STD_MAIN	= standard/main.c
+STD_TEST	= std_libasm
 
 
-TEST		= test_libasm
-TEST_BONUS	= test_libasm_bonus
+SRCS_BONUS	= bonus/src/ft_atoi_base_bonus.s \
+			  bonus/src/ft_list_push_front_bonus.s \
+			  bonus/src/ft_list_size_bonus.s \
+			  bonus/src/ft_list_sort_bonus.s
 
+BONUS_OBJS  = $(SRCS_BONUS:.s=.o)
+
+BONUS_MAIN	= bonus/main_bonus.c
+BONUS_TEST	= bonus_libasm
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
+$(NAME): $(STD_OBJS)
+	$(AR) $(NAME) $(STD_OBJS)
 
 %.o: %.s
 	$(NCC) $(ASMFLAGS) -o $@ $<
 
+test: $(NAME)
+	$(CC) $(CFLAGS) -o $(STD_TEST) $(STD_MAIN) -L. -lasm
+
+bonus: $(STD_OBJS) $(BONUS_OBJS)
+	$(AR) $(NAME) $(STD_OBJS) $(BONUS_OBJS)
+
+test_bonus: bonus
+	$(CC) $(CFLAGS) -o $(BONUS_TEST) $(BONUS_MAIN) -L. -lasm
+
 clean:
-	rm -f $(OBJS) $(BONUS_OBJS)
+	$(RM) $(STD_OBJS) $(BONUS_OBJS)
 
 fclean: clean
-	rm -f $(NAME) $(TEST)
+	$(RM) $(NAME) $(STD_TEST) $(BONUS_TEST)
 
 re: fclean all
 
 
-test: $(NAME)
-	$(CC) $(CFLAGS) -o $(TEST) main.c -L. -lasm
-
-
-bonus: $(OBJS) $(BONUS_OBJS)
-	ar rcs $(NAME) $(OBJS) $(BONUS_OBJS)
-
-test_bonus: bonus
-	gcc $(CFLAGS) -L. -lasm -o $(TEST_BONUS) main_bonus.c
-
-
-
-.PHONY: clean fclean re
+.PHONY: all clean fclean re bonus test test_bonus

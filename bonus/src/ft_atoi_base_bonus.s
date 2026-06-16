@@ -1,4 +1,4 @@
-%include "src/libasm.inc"
+%include "libasm_bonus.inc"
 
 section .text
     global ft_atoi_base

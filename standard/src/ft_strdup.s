@@ -1,12 +1,12 @@
 
-%include "src/libasm.inc"
+%include "libasm.inc"
 
 section .text
 	global  ft_strdup
     extern  malloc
     extern  ft_strlen
     extern  ft_strcpy
-    extern __errno_location
+
 
 ft_strdup:
 

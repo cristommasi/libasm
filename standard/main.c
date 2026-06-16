@@ -160,78 +160,6 @@ void    test_read(void)
     printf("\n");
 }
 
-extern int ft_atoi_base(char *str, char *base);
-void	test_atoi_base(void)
-{
-	char *base10 = "0123456789";
-	char *base2 = "01";
-	char *base8 = "01234567";
-	char *base16 = "0123456789abcdef";
-	char *base36 = "0123456789abcdefghijklmnopqrstuvwxyz";
-    char *base16_upper = "0123456789ABCDEF";
-
-	char *num1 = "";
-	char *num2 = "-2147483648";
-	char *num3 = "   +42";
-	char *num4 = "\t\n\v\f\r-42";
-	char *num5 = "+--++42";
-	char *num6 = "42abc";
-	char *num7 = "101010";
-	char *num8 = "2a";
-	char *num9 = "7fffffff";
-	char *num10 = "-80000000";
-
-
-	printf("------ atoi & strtol VS ft_atoi_base -------\n\n");
-
-	printf("empty string                     = %d, %d\n", atoi(num1), ft_atoi_base(num1, base10));
-	printf("INT_MIN                          = %d, %d\n", atoi(num2), ft_atoi_base(num2, base10));
-	printf("spaces + 42                      = %d, %d\n", atoi(num3), ft_atoi_base(num3, base10));
-	printf("all whitespace + -42             = %d, %d\n", atoi(num4), ft_atoi_base(num4, base10));
-	printf("invalid sign sequence            = %d, %d\n", atoi(num5), ft_atoi_base(num5, base10));
-	printf("stop at letters                  = %d, %d\n", atoi(num6), ft_atoi_base(num6, base10));
-	printf("binary 101010                    = %d, %d\n", (int)strtol(num7, NULL, 2), ft_atoi_base(num7, base2));
-	printf("hex 2a                           = %d, %d\n", (int)strtol(num8, NULL, 16), ft_atoi_base(num8, base16));
-	printf("hex max int (lowercase input)    = %d, %d\n", (int)strtol("7fffffff", NULL, 16), ft_atoi_base(num9, base16));
-	printf("hex min int (negative style)     = %d, %d\n", (int)strtol("-80000000", NULL, 16), ft_atoi_base(num10, base16));
-    printf("octal 52                         = %d, %d\n", (int)strtol("52", NULL, 8), ft_atoi_base("52", base8));
-    printf("octal max int                    = %d, %d\n", (int)strtol("17777777777", NULL, 8), ft_atoi_base("17777777777", base8));
-    printf("octal zero                       = %d, %d\n", (int)strtol("0", NULL, 8), ft_atoi_base("0", base8));
-    printf("octal invalid stops at 8         = %d, %d\n", (int)strtol("12345877", NULL, 8), ft_atoi_base("12345877", base8));
-    printf("base36 16                        = %d, %d\n", (int)strtol("16", NULL, 36), ft_atoi_base("16", base36));
-    printf("base36 z                         = %d, %d\n", (int)strtol("z", NULL, 36), ft_atoi_base("z", base36));
-    printf("base36 10z                       = %d, %d\n", (int)strtol("10z", NULL, 36), ft_atoi_base("10z", base36));
-    printf("base36 big number                = %d, %d\n", (int)strtol("1z141z3", NULL, 36), ft_atoi_base("1z141z3", base36));
-    printf("null base                        = %d\n", ft_atoi_base("42", NULL));
-    printf("empty base                       = %d\n", ft_atoi_base("42", ""));
-    printf("single char base                 = %d\n", ft_atoi_base("42", "0"));
-    printf("duplicate in base                = %d\n", ft_atoi_base("42", "0012345678"));
-    printf("base contains +                  = %d\n", ft_atoi_base("42", "0123456789+"));
-    printf("base contains -                  = %d\n", ft_atoi_base("42", "0123456789-"));
-    printf("base contains space              = %d\n", ft_atoi_base("42", "0123456789 "));
-    printf("hex upper 2A                     = %d, %d\n", (int)strtol("2A", NULL, 16), ft_atoi_base("2A", base16_upper));
-    printf("overflow positive                = %d, %d\n", atoi("2147483648"),  ft_atoi_base("2147483648",  base10));
-    printf("overflow large                   = %d, %d\n", atoi("9999999999"),  ft_atoi_base("9999999999",  base10));
-    printf("underflow                        = %d, %d\n", atoi("-2147483649"), ft_atoi_base("-2147483649", base10));
-    printf("way overflow                     = %d, %d\n", atoi("99999999999999999999"), ft_atoi_base("99999999999999999999", base10));
-    printf("just plus                        = %d, %d\n", atoi("+"),           ft_atoi_base("+",           base10));
-    printf("just minus                       = %d, %d\n", atoi("-"),           ft_atoi_base("-",           base10));
-    printf("plus zero                        = %d, %d\n", atoi("+0"),          ft_atoi_base("+0",          base10));
-    printf("minus zero                       = %d, %d\n", atoi("-0"),          ft_atoi_base("-0",          base10));
-    printf("double minus                     = %d, %d\n", atoi("--42"),        ft_atoi_base("--42",        base10));
-    printf("only whitespace                  = %d, %d\n", atoi("     "),       ft_atoi_base("     ",       base10));
-    printf("whitespace after digits          = %d, %d\n", atoi("42   "),       ft_atoi_base("42   ",       base10)); // should stop at space
-    printf("whitespace between digits        = %d, %d\n", atoi("4 2"),         ft_atoi_base("4 2",         base10)); // should give 4
-    printf("all zeros                        = %d, %d\n", atoi("000000"),      ft_atoi_base("000000",      base10));
-    printf("leading zeros                    = %d, %d\n", atoi("007"),         ft_atoi_base("007",         base10));
-    printf("negative leading zeros           = %d, %d\n", atoi("-007"),        ft_atoi_base("-007",        base10));
-    printf("binary all ones 32bit            = %d, %d\n", (int)strtol("11111111111111111111111111111111", NULL, 2), ft_atoi_base("11111111111111111111111111111111", base2));
-    printf("binary invalid char              = %d, %d\n", (int)strtol("1012", NULL, 2), ft_atoi_base("1012", base2)); // stops at '2'
-    printf("no valid digits at all           = %d, %d\n", atoi("abc"),         ft_atoi_base("abc",         base10)); // should return 0
-    printf("sign then invalid                = %d, %d\n", atoi("+abc"),        ft_atoi_base("+abc",        base10)); // should return 0
-
-}
-
 extern char *ft_strdup(char *s);
 void        test_strdup(void) {
 
@@ -263,42 +191,14 @@ void        test_strdup(void) {
 }
 
 
-typedef struct s_list
-{
-    void *data;
-    struct s_list *next;
-
-}               t_list;
-
-extern void ft_list_push_front(t_list **begin_list, void *data);
-void        test_list_push_front(void) {
-
-    t_list *head = malloc(sizeof(t_list));
-    head->data = malloc(sizeof(size_t));
-    *(size_t *)head->data = 69;
-    head->next = NULL;
-
-    printf("PRE   node head = %zu\n", *(size_t *)head->data);
-    void *data2 = malloc(sizeof(size_t));
-    *(size_t *)data2 = 420;
-
-    ft_list_push_front(&head, data2);
-
-    printf("AFTER node head = %zu\n", *(size_t *)head->data);
-    printf("AFTER node next = %zu\n", *(size_t *)head->next->data);
-}
-
-
 int	main(void)
 {
-    // test_strlen();
-    // test_strcpy();
-    // test_strcmp();
-    // test_write();
-    // test_read();
-	// test_atoi_base();
-    // test_strdup();
-    test_list_push_front();
+    test_strlen();
+    test_strcpy();
+    test_strcmp();
+    test_write();
+    test_read();
+    test_strdup();
 	return (0);
 }
 

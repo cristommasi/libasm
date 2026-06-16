@@ -1,4 +1,4 @@
-%include "src/libasm.inc"
+%include "libasm_bonus.inc"
 
 section .text
     global ft_list_push_front
@@ -12,8 +12,8 @@ ft_list_push_front:
     stack_alloc
 
 
-    mov begin_list, rdi
-    mov data, rsi
+    mov     begin_list, rdi
+    mov     data, rsi
 
     .alloc:
         mov     rdi, 16             
@@ -30,5 +30,5 @@ ft_list_push_front:
         mov     [rdi], rax
 
 
-    .return
+    .return:
         stack_leave
