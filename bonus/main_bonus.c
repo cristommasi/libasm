@@ -55,7 +55,15 @@ t_list      **create_list(size_t len, int random) {
 
 void        print_list(t_list **begin_list) {
 
+    if (!begin_list)  {
+        printf("[NULL]\n");
+        return ;
+    }
     t_list *cur = *begin_list;
+    if (!cur) {
+        printf("[NULL]\n");
+        return ;
+    }
     printf("[%zu] -> ", *(size_t *)cur->data);
     cur = cur->next;
     while (cur) {
@@ -72,11 +80,9 @@ int         compare(void *a, void *b) {
 
 }
 
-
 void        free_fct(void *data) {
     free(data);
 }
-
 
 
 void	    test_atoi_base(void)
@@ -100,7 +106,7 @@ void	    test_atoi_base(void)
 	char *num10 = "-80000000";
 
 
-	printf("------ atoi & strtol VS ft_atoi_base -------\n\n");
+	printf("------------------------------------ atoi & strtol VS ft_atoi_base ------------------------------------\n\n");
 
 	printf("empty string                     = %d, %d\n", atoi(num1), ft_atoi_base(num1, base10));
 	printf("INT_MIN                          = %d, %d\n", atoi(num2), ft_atoi_base(num2, base10));
@@ -152,7 +158,7 @@ void	    test_atoi_base(void)
 
 void        test_list_push_front(void) {
 
-    printf("------ ft_list_push_front -------\n\n");
+    printf("------------------------------------ ft_list_push_front -------------------------------------\n\n");
 
     t_list  *list = NULL, **begin_list = &list;
     size_t  **data_arr = create_arr(8, NOT_RANDOM);
@@ -186,7 +192,7 @@ void        test_list_push_front(void) {
 
 void        test_list_size(void) {
 
-    printf("------ ft_list_size -------\n\n");
+    printf("------------------------------------ ft_list_size -------------------------------------\n\n");
 
     t_list  **begin_list = create_list(8, RANDOM);
     print_list(begin_list);
@@ -197,7 +203,7 @@ void        test_list_size(void) {
 
 void        test_list_sort(void) {
 
-    printf("------ ft_list_sort -------\n\n");
+    printf("------------------------------------ ft_list_sort -------------------------------------\n\n");
     t_list  **begin_list = create_list(8, RANDOM);
 
     printf("begin_list     = ");
@@ -209,30 +215,59 @@ void        test_list_sort(void) {
 
 void        test_list_remove_if(void) {
 
-    printf("------ ft_list_remove_if -------\n\n");
+    printf("------------------------------------ ft_list_remove_if -------------------------------------\n\n");
 
     t_list  **begin_list = create_list(16, RANDOM);
     size_t    data_ref = 115;
-
-
-    printf("begin_list          = ");
+    printf("begin_list = \n");
     ft_list_sort(begin_list, &compare);
     print_list(begin_list);
-
-    
+    printf("\n");
     ft_list_remove_if(begin_list, &data_ref, &compare, &free_fct);
-
-    printf("ft_list_remove_if() = ");
+    printf("ft_list_remove_if(begin_list, &115, &compare, &free_fct) = \n");
     print_list(begin_list);
+    printf("\n");
+
+
+    t_list  **begin_list2 = create_list(16, RANDOM);;
+    size_t    data_ref2 = 200;
+    printf("begin_list2 = \n\n");
+    ft_list_sort(begin_list2, &compare);
+    print_list(begin_list2);
+    printf("\n");
+    ft_list_remove_if(begin_list2, &data_ref2, &compare, &free_fct);
+    printf("ft_list_remove_if(begin_list2, &20, &compare, &free_fct) = \n");
+    print_list(begin_list2);
+    printf("\n\n");
+
+    t_list  **begin_list3 = NULL;
+    size_t    data_ref3 = 115;
+    printf("begin_list3 = \n");
+    ft_list_sort(begin_list3, &compare);
+    print_list(begin_list3);
+    printf("\n");
+    ft_list_remove_if(begin_list3, &data_ref3, &compare, &free_fct);
+    printf("ft_list_remove_if(NULL, &data_ref3, &compare, &free_fct) = \n");
+    print_list(begin_list3);
+    printf("\n\n");
+
+    t_list  **begin_list4 = create_list(16, RANDOM);
+    printf("begin_list4 = \n");
+    ft_list_sort(begin_list4, &compare);
+    print_list(begin_list4);
+    printf("\n");
+    ft_list_remove_if(begin_list4, NULL, &compare, &free_fct);
+    printf("ft_list_remove_if(begin_list4, NULL, &compare, &free_fct) = \n");
+    print_list(begin_list4);
+    printf("\n");
 }
 
 int	main(void)
 {
-
-	// test_atoi_base();
-    // test_list_push_front();
-    // test_list_size();
-    // test_list_sort();
+	test_atoi_base();
+    test_list_push_front();
+    test_list_size();
+    test_list_sort();
     test_list_remove_if();
 	return (0);
 }

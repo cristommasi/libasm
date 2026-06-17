@@ -20,7 +20,7 @@ STD_SRCS	= standard/src/ft_strlen.s \
 STD_OBJS    = $(STD_SRCS:.s=.o)
 
 STD_MAIN	= standard/main.c
-STD_TEST	= std_libasm
+STD_TEST	= exec_standard
 
 
 SRCS_BONUS	= bonus/src/ft_atoi_base_bonus.s \
@@ -32,7 +32,7 @@ SRCS_BONUS	= bonus/src/ft_atoi_base_bonus.s \
 BONUS_OBJS  = $(SRCS_BONUS:.s=.o)
 
 BONUS_MAIN	= bonus/main_bonus.c
-BONUS_TEST	= bonus_libasm
+BONUS_TEST	= exec_bonus
 
 all: $(NAME)
 
@@ -42,7 +42,7 @@ $(NAME): $(STD_OBJS)
 %.o: %.s
 	$(NCC) $(ASMFLAGS) -o $@ $<
 
-test: $(NAME)
+test_standard: $(NAME)
 	$(CC) $(CFLAGS) -o $(STD_TEST) $(STD_MAIN) -L. -lasm
 
 bonus: $(STD_OBJS) $(BONUS_OBJS)

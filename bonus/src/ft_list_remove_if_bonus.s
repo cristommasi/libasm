@@ -24,12 +24,12 @@ ft_list_remove_if:
     stack_enter
     stack_u64   data_ref
     stack_alloc
-    push    begin_list
-    push    f_cmp
-    push    f_free_fct
-    push    cur
-    push    prev
-    push    padding
+    push        begin_list
+    push        f_cmp
+    push        f_free_fct
+    push        cur
+    push        prev
+    push        padding
 
     .null_check:
         test    rdi, rdi
@@ -52,36 +52,40 @@ ft_list_remove_if:
     
     .loop:
 
-        test    cur, cur
-        jz      .return
+        test    cur, cur                                ; if (cur == NULL)
+        jz      .return                                 ; return ;
 
         .compare:
             mov     rdi, [cur + S_INFO.data]
             mov     rsi, data_ref
-            call    f_cmp
-            test    rax, rax
-            jnz      .continue
+            call    f_cmp                               ;int ret =  cmp(cur->data, data_ref)
+            test    rax, rax                            ; if (ret != 0)
+            jnz      .continue                          ; goto continue;
 
             .remove_node:
 
-                mov     rdi, [cur + S_INFO.data]
-                call    f_free_fct
-                mov     rax, [cur + S_INFO.next]
+                mov     rdi, [cur + S_INFO.data]        
+                call    f_free_fct                      ; free_fct(cur->data)
+                mov     rax, [cur + S_INFO.next]        ; cur->next
 
-                test    prev, prev
-                jz     .update_head
+                test    prev, prev                      ; if (!prev)
+                jz     .update_head                     ; goto update_head;
 
                 .update_prev:
-                    mov     [prev + S_INFO.next], rax
-                    jmp     .continue
+                    mov     [prev + S_INFO.next], rax   ; prev->next = cur->next;
+                    jmp     .continue_swap              ; goto continue_swap;
 
                 .update_head:
-                    mov     [begin_list], rax
+                    mov     [begin_list], rax           ; *begin_list = cur->next
 
-        .continue:
-            mov     prev, cur
-            mov     cur, [cur + S_INFO.next]
-            jmp     .loop
+                .continue_swap:
+                    mov     cur, rax                    ; cur = cur->next
+                    jmp     .loop                       ; goto loop;
+
+        .continue:                                      ; elseif (ret == 0)
+            mov     prev, cur                           ; prev = cur;
+            mov     cur, [cur + S_INFO.next]            ; cur = cur->next;
+            jmp     .loop                               ; goto loop;
 
 
     .return:
