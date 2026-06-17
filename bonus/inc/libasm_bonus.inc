@@ -87,23 +87,5 @@
 %define S_INFO.next 8
 
 
-%macro param_call 1-6
-    %if %0 >= 2
-        mov rdi, %2
-    %endif
-    %if %0 >= 3
-        mov rsi, %3
-    %endif
-    %if %0 >= 4
-        mov rdx, %4
-    %endif
-    %if %0 >= 5
-        mov rcx, %5
-    %endif
-    %if %0 >= 6
-        mov r8, %6
-    %endif
-    call %1
-%endmacro
 
 %endif

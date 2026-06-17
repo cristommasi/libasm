@@ -7,8 +7,8 @@ ft_strcmp:								; int ft_strcmp(const char *s1, const char *s2) {
 	xor     rax, rax					;	int i = 0;
 										;
 	.loop:								;	while (1) {
-		mov     r8b, BYTE [rdi + rax]	;		char temp1 = *(s1 + i);
-		mov     r9b, BYTE [rsi + rax]	;		char temp2 = *(s2 + i);
+		mov     r8b, byte [rdi + rax]	;		char temp1 = *(s1 + i);
+		mov     r9b, byte [rsi + rax]	;		char temp2 = *(s2 + i);
 		cmp		r8b, r9b				;		if (temp1 != temp2)
 		jne		.break					;			break ;
 		cmp		r8b, 0					;		if (temp1 == 0)

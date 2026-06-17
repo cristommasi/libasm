@@ -48,7 +48,9 @@ ft_list_sort:
             mov     next, [cur + S_INFO.next]                               ; next = cur->next;
             .compare:
 
-                param_call func, [cur + S_INFO.data], [next + S_INFO.data]  ; int ret = cmp(cur->data, next->data);
+                mov     rdi, [cur + S_INFO.data]
+                mov     rsi, [next + S_INFO.data]
+                call    func                                                ; int ret = cmp(cur->data, next->data);
                 test    rax, rax                                            ; if (!ret)
                 jz      .no_swap                                            ; goto noswap;
 

@@ -162,7 +162,6 @@ void        test_list_size(void) {
     printf("\n");
 }
 
-
 extern void ft_list_sort(t_list **begin_list, int (*cmp)());
 void        test_list_sort(void) {
 
