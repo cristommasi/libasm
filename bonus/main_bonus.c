@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/types.h>
+
+#define RANDOM 1
+#define NOT_RANDOM 0
 
 typedef struct s_list
 {
@@ -11,6 +15,43 @@ typedef struct s_list
     struct s_list *next;
 
 }               t_list;
+
+extern int ft_atoi_base(char *str, char *base);
+extern void ft_list_push_front(t_list **begin_list, void *data);
+extern int ft_list_size(t_list **begin_list);
+extern void ft_list_sort(t_list **begin_list, int (*cmp)());
+extern void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
+
+size_t      random_number(void) {
+
+    return (rand() % 200);  // range: -100 to 99
+}
+
+size_t  **create_arr(size_t len, int random) {
+
+    size_t **arr = malloc(sizeof(size_t *) * len);
+    for (size_t i = 0; i < len; i++) {
+        arr[i] = malloc(sizeof(size_t));
+        if (random)
+            *arr[i] = random_number();
+        else
+            *arr[i] = i;
+    }
+    return (arr);
+}
+
+t_list      **create_list(size_t len, int random) {
+
+    t_list  **begin_list = malloc(sizeof(t_list *));
+    *begin_list = NULL;
+    size_t  **arr = create_arr(len, random);
+
+    for (size_t i = 0; i < len; i++) {
+
+        ft_list_push_front(begin_list, arr[i]);
+    }
+    return (begin_list);
+}
 
 void        print_list(t_list **begin_list) {
 
@@ -31,7 +72,13 @@ int         compare(void *a, void *b) {
 
 }
 
-extern int ft_atoi_base(char *str, char *base);
+
+void        free_fct(void *data) {
+    free(data);
+}
+
+
+
 void	    test_atoi_base(void)
 {
 	char *base10 = "0123456789";
@@ -103,19 +150,18 @@ void	    test_atoi_base(void)
 
 }
 
-extern void ft_list_push_front(t_list **begin_list, void *data);
 void        test_list_push_front(void) {
 
     printf("------ ft_list_push_front -------\n\n");
 
     t_list  *list = NULL, **begin_list = &list;
-    size_t  data_arr[8] = {0};
+    size_t  **data_arr = create_arr(8, NOT_RANDOM);
 
     
     printf("\nt_list  **begin_list = %p, NULL;  \n", *begin_list);
     for (size_t i = 0; i < 8; i++) {
-        data_arr[i] = i;
-        ft_list_push_front(begin_list, &data_arr[i]);
+        *data_arr[i] = i;
+        ft_list_push_front(begin_list, data_arr[i]);
     }
     printf("ft_list_push_front()  = ");
     print_list(begin_list);
@@ -124,53 +170,36 @@ void        test_list_push_front(void) {
     t_list  *list2 = malloc(sizeof(t_list));
     size_t data = 69;
     list2->data = &data;
-
     t_list **begin_list2 = malloc(sizeof(t_list*));
     *begin_list2 = list2;
-
-    size_t  data_arr2[8] = {0};
+    size_t  **data_arr2 = create_arr(8, RANDOM);
 
     printf("\nt_list  **begin_list2 = %p, %zu;  \n", begin_list2, *(size_t*)list2->data);
     for (size_t i = 0; i < 8; i++) {
-        data_arr2[i] = i;
-        ft_list_push_front(begin_list2, &data_arr2[i]);
+        *data_arr2[i] = i;
+        ft_list_push_front(begin_list2, data_arr2[i]);
     }
     printf("ft_list_push_front()  = ");
     print_list(begin_list2);
-
     printf("\n");
-
 }
 
-extern int ft_list_size(t_list **begin_list);
 void        test_list_size(void) {
 
     printf("------ ft_list_size -------\n\n");
 
-    t_list  *list = NULL, **begin_list = &list;
-    size_t  data_arr[8] = {0};
-
-    
-    for (size_t i = 0; i < 8; i++) {
-        data_arr[i] = i;
-        ft_list_push_front(begin_list, &data_arr[i]);
-    }
+    t_list  **begin_list = create_list(8, RANDOM);
     print_list(begin_list);
     printf("ft_list_size()  = %d\n", ft_list_size(begin_list));
-
 
     printf("\n");
 }
 
-extern void ft_list_sort(t_list **begin_list, int (*cmp)());
 void        test_list_sort(void) {
 
     printf("------ ft_list_sort -------\n\n");
-    t_list  *list = NULL, **begin_list = &list;
-    size_t  data_arr[8] = {6, 8, 3, 5, 9, 0, 7, 5};
-    for (size_t i = 0; i < 8; i++) {
-        ft_list_push_front(begin_list, &data_arr[i]);
-    }
+    t_list  **begin_list = create_list(8, RANDOM);
+
     printf("begin_list     = ");
     print_list(begin_list);
     ft_list_sort(begin_list, &compare);
@@ -178,12 +207,32 @@ void        test_list_sort(void) {
     print_list(begin_list);
 }
 
+void        test_list_remove_if(void) {
+
+    printf("------ ft_list_remove_if -------\n\n");
+
+    t_list  **begin_list = create_list(16, RANDOM);
+    size_t    data_ref = 115;
+
+
+    printf("begin_list          = ");
+    ft_list_sort(begin_list, &compare);
+    print_list(begin_list);
+
+    
+    ft_list_remove_if(begin_list, &data_ref, &compare, &free_fct);
+
+    printf("ft_list_remove_if() = ");
+    print_list(begin_list);
+}
+
 int	main(void)
 {
 
-	test_atoi_base();
-    test_list_push_front();
-    test_list_size();
-    test_list_sort();
+	// test_atoi_base();
+    // test_list_push_front();
+    // test_list_size();
+    // test_list_sort();
+    test_list_remove_if();
 	return (0);
 }

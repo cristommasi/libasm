@@ -26,7 +26,8 @@ STD_TEST	= std_libasm
 SRCS_BONUS	= bonus/src/ft_atoi_base_bonus.s \
 			  bonus/src/ft_list_push_front_bonus.s \
 			  bonus/src/ft_list_size_bonus.s \
-			  bonus/src/ft_list_sort_bonus.s
+			  bonus/src/ft_list_sort_bonus.s \
+			  bonus/src/ft_list_remove_if_bonus.s
 
 BONUS_OBJS  = $(SRCS_BONUS:.s=.o)
 

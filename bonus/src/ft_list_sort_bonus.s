@@ -1,7 +1,7 @@
 %include "../inc/libasm_bonus.inc"
 
 %define begin_list rbx
-%define func       r12
+%define f_cmp      r12
 %define prev       r13
 %define cur        r14
 %define next       r15
@@ -15,7 +15,7 @@ ft_list_sort:
 
     stack_enter
     push    begin_list
-    push    func
+    push    f_cmp
     push    prev
     push    cur
     push    next
@@ -31,7 +31,7 @@ ft_list_sort:
         jz      .return                                                     ; return ;
 
     mov     begin_list, rdi                                                 ; begin_list        
-    mov     func, rsi                                                       ; func = (*cmp)();
+    mov     f_cmp, rsi                                                      ; f_cmp = (*cmp)();
     .loop:
 
         mov     disordered, 0                                               ; disordered = 0
@@ -50,7 +50,7 @@ ft_list_sort:
 
                 mov     rdi, [cur + S_INFO.data]
                 mov     rsi, [next + S_INFO.data]
-                call    func                                                ; int ret = cmp(cur->data, next->data);
+                call    f_cmp                                               ; int ret = cmp(cur->data, next->data);
                 test    rax, rax                                            ; if (!ret)
                 jz      .no_swap                                            ; goto noswap;
 
@@ -91,6 +91,6 @@ ft_list_sort:
         pop    next
         pop    cur
         pop    prev
-        pop    func
+        pop    f_cmp
         pop    begin_list
         stack_leave
