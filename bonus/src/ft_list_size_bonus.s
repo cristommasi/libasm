@@ -11,7 +11,7 @@ ft_list_size:
     .null_check:
         test    rdi, rdi                    ; if (!begin_list)
         jz      .return                     ; return ;
-        mov     rcx, [rdi]                  ; head = *begin_list
+        mov     rcx, rdi
 
     .loop:
 

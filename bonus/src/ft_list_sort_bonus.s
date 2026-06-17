@@ -5,7 +5,7 @@
 %define prev       r13
 %define cur        r14
 %define next       r15
-%define disordered r9
+
 
 section .text
     global ft_list_sort
@@ -14,12 +14,14 @@ section .text
 ft_list_sort:
 
     stack_enter
-    push    begin_list
-    push    f_cmp
-    push    prev
-    push    cur
-    push    next
-    push    disordered
+    stack_u64   disordered
+    stack_alloc
+    push        begin_list
+    push        f_cmp
+    push        prev
+    push        cur
+    push        next
+    sub         rsp, 8
 
     .null_check:
         test    rdi, rdi                                                    ; if (!begin_list)
@@ -51,8 +53,8 @@ ft_list_sort:
                 mov     rdi, [cur + S_INFO.data]
                 mov     rsi, [next + S_INFO.data]
                 call    f_cmp                                               ; int ret = cmp(cur->data, next->data);
-                test    rax, rax                                            ; if (!ret)
-                jz      .no_swap                                            ; goto noswap;
+                test     eax, eax                                              ; if (!ret)
+                jle      .no_swap                                            ; goto noswap;
 
                 .swap:
 
@@ -81,13 +83,14 @@ ft_list_sort:
                 mov     cur, [prev + S_INFO.next]                           ; cur = prev->next;
                 jmp     .inner_loop                                         ; goto inner_loop;
 
-        .test_disorder:                  
-            test    disordered, disordered                                  ; if (disordered)
+        .test_disorder:  
+            mov     rax, disordered                
+            test    rax, rax                                                ; if (disordered)
             jnz     .loop                                                   ; goto loop;
 
 
     .return:
-        pop    disordered
+        add    rsp, 8
         pop    next
         pop    cur
         pop    prev

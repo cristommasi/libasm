@@ -1,10 +1,4 @@
 
-; Create the function ft_list_remove_if which removes from the list all elements
-; IF (*cmp)(list_ptr->data, data_ref) == 0;
-;   (*free_fct)(list_ptr->data);
-;   REMOVE list_ptr;
-
-
 %include "../inc/libasm_bonus.inc"
 
 %define begin_list  rbx
@@ -12,13 +6,12 @@
 %define f_free_fct  r13
 %define cur         r14
 %define prev        r15
-%define padding     rax
 
 
 section .text
     global ft_list_remove_if
+    extern free
 
-; void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
 ft_list_remove_if:
 
     stack_enter
@@ -29,7 +22,7 @@ ft_list_remove_if:
     push        f_free_fct
     push        cur
     push        prev
-    push        padding
+    sub         rsp, 8
 
     .null_check:
         test    rdi, rdi
@@ -49,7 +42,6 @@ ft_list_remove_if:
         mov     cur, [begin_list]
         mov     prev, 0
         
-    
     .loop:
 
         test    cur, cur                                ; if (cur == NULL)
@@ -64,7 +56,7 @@ ft_list_remove_if:
 
             .remove_node:
 
-                mov     rdi, [cur + S_INFO.data]        
+                mov     rdi, qword [cur + S_INFO.data]        
                 call    f_free_fct                      ; free_fct(cur->data)
                 mov     rax, [cur + S_INFO.next]        ; cur->next
 
@@ -79,6 +71,10 @@ ft_list_remove_if:
                     mov     [begin_list], rax           ; *begin_list = cur->next
 
                 .continue_swap:
+                    mov     rdi, cur
+                    push    rax
+                    call    free wrt ..plt              ; free(node)
+                    pop     rax
                     mov     cur, rax                    ; cur = cur->next
                     jmp     .loop                       ; goto loop;
 
@@ -89,7 +85,7 @@ ft_list_remove_if:
 
 
     .return:
-        pop     padding
+        add     rsp, 8
         pop     prev
         pop     cur
         pop     f_free_fct
