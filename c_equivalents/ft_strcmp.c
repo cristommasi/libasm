@@ -1,24 +1,26 @@
 #include "libasm.h"
 
+/*const char *s1, const char *s2*/
+void    ft_strcmp() {
 
-int     ft_strcmp(const char *s1, const char *s2) {
+    rax ^= rax;
 
-    int     i = 0;
-    char temp1;
-    char temp2;
+    loop:
+        r8 = *(unsigned char*)(rdi + rax);
+        r9 = *(unsigned char*)(rsi + rax);
 
-    while (1) {
+        if ( r8 != r9 )
+            goto break_;
 
-        temp1 = *(s1 + i);
-        temp2 = *(s2 + i);
-        if (temp1 != temp2)
-            break ;
-        if (temp1 == 0)
-            break ;
-        i++;
-    }
-    int res = (int)temp1;
-    int res2 = (int)temp2;
-    res -= res2;
-    return (res);
+        if ( r8 == 0 )
+            goto break_;
+
+        rax++;
+        goto loop;
+
+    break_:
+        rax = r8;
+        r10 = r9;
+        rax -= r10;
+        return ;
 }

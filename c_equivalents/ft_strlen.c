@@ -1,15 +1,18 @@
 
 #include "libasm.h"
 
-size_t      ft_strlen(const char *s) {
+/*const char *s = rdi*/
+void    ft_strlen() {
 
-    size_t  i = 0;
+    rax ^= rax;
+    
+    loop:
 
-    while (1) {
+        if ( *(char*)(rdi + rax) == 0)
+            goto break_;
+        rax++;
+        goto loop;
 
-        if ((*s + i) == 0)
-            break ;
-        i++;
-    }
-    return (i);
+    break_:
+        return ;
 }

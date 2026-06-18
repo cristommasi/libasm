@@ -1,19 +1,23 @@
 #include "libasm.h"
 
-char    *ft_strcpy(char *dest, char *src) {
 
-    size_t i = 0;
+/*char *dest = rdi, char *src == rsi*/
+void    ft_strcpy() {
 
-    while (1) {
+    rax ^= rax;
 
-        char c = (*src + i);
+    loop:
 
-        *(dest + i) = c;
-
-        if ((*src + i) == 0)
-            break ;
+        r8 = *(char*)(rsi + rax);
+        *(char*)(rdi + rax) = r8;
         
-        i++;
-    }
-    return (dest);
+        if ( r8 == 0 )
+            goto break_;
+        rax++;
+        goto loop;
+
+    break_:
+        rax = rdi;
+        return ;
+
 }

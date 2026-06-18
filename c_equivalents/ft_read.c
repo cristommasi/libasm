@@ -1,16 +1,22 @@
 
 #include "libasm.h"
 
-ssize_t     ft_read(int fd, const void *buf, size_t count) {
+/*int fd = rdi, const void *buf = rsi, size_t count = rcx*/
+void    ft_read() {
 
-    ssize_t res = syscall(SYS_read, rdi, buf, count);
+    rax = SYS_read;
+    rax = syscall(rax, rdi, rsi, rcx);
+    if (rax < 0)
+        goto error;
 
-    if (res < 0) {
+    return ;
 
-        res = -res;
-        int *errno_ = __errno_location();
-        *errno_ = (int)res;
-        res = -1;
-    }
-    return (res);
+    error:
+
+        rax = -rax;
+        rbx = rax;
+        rax = (ssize_t)__errno_location();
+        *(int*)rax = (int)rbx;
+        rax = -1;
+        return ;
 }
