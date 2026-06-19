@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <string.h>
 
+
 extern ssize_t rax;
 extern ssize_t rbx;
 extern ssize_t rcx;
@@ -34,34 +35,65 @@ extern ssize_t r15;
 
 extern unsigned char stack[STACK_SIZE];
 
-static inline void print_stack(char *ptr, char *str, ssize_t value, char *command) {
+static inline void print_stack(const char *instr)
+{
+	ssize_t	i;
+	ssize_t	addr;
+	ssize_t	value;
+	ssize_t	start;
 
 
-    if (str)
-        printf("stack[%p] = %s - %s\n",  ptr, str, command);
-    else
-        printf("stack[%p] = %zu - %s\n",  ptr, value, command);
+	start = rbp;
+    printf("--------------------------------------------- | %s\n", instr);
+	for (i = 0; i < 12; i++)
+	{
+		addr = start - (i * 8);
 
+		if (addr < 0 || addr >= STACK_SIZE)
+			continue ;
+
+		value = *(ssize_t *)(stack + addr);
+
+        printf( "stack[0x%05zx] | %#018zx", (size_t)addr & 0xFFFF, (size_t)value);
+
+		if (addr == rsp && addr == rbp)
+			printf(" | rsp-rbp");
+		else if (addr == rsp)
+			printf(" | rsp    ");
+		else if (addr == rbp)
+			printf(" | rbp    ");
+        else
+            printf(" |        ");
+
+        printf(" | \n");
+
+	}
+    printf("\n");
 }
- 
-static inline void    push(ssize_t value, char *command)
+
+
+static inline void    push(ssize_t value)
 {
     rsp -= 8;
     *(ssize_t *)(stack + rsp) = value;
-    rbp = rsp;
 
 }
  
 static inline ssize_t     pop(void)
 {
-    rsp = rbp;
-    ssize_t value = *(ssize_t *)(stack + rsp);
+    ssize_t value;
+
+    value = *(ssize_t *)(stack + rsp);
     rsp += 8;
 
-
-    return value;
+    return (value);
 }
 
+static inline void    stack_init(void)
+{
+    rsp = STACK_SIZE;
+    rbp = STACK_SIZE;
+}
 
 
 /*int fd = rdi, const void *buf = rsi, size_t count = rcx*/

@@ -1,5 +1,5 @@
 
-#include "libasm.h"
+#include "../inc/libasm.h"
 
 /*const char *s = rdi*/
 void    ft_strlen() {

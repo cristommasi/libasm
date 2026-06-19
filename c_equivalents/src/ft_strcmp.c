@@ -1,4 +1,4 @@
-#include "libasm.h"
+#include "../inc/libasm.h"
 
 /*const char *s1, const char *s2*/
 void    ft_strcmp() {

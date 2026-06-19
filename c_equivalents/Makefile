@@ -6,9 +6,8 @@ RM = rm -rf
 
 
 SRCS = 	main_c_equivalents.c \
-		ft_read.c ft_strcpy.c ft_strlen.c ft_write.c ft_strcmp.c  ft_strdup.c
-#  ft_list_sort.c     
-# ft_atoi_base.c ft_list_size.c ft_list_push_front.c  
+		src/ft_read.c src/ft_strcpy.c src/ft_strlen.c src/ft_write.c src/ft_strcmp.c  src/ft_strdup.c
+
 OBJS = $(SRCS:.c=.o)
 
 

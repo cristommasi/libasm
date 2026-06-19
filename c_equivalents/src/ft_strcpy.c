@@ -1,4 +1,4 @@
-#include "libasm.h"
+#include "../inc/libasm.h"
 
 
 /*char *dest = rdi, char *src == rsi*/

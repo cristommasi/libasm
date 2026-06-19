@@ -1,5 +1,5 @@
 
-#include "libasm.h"
+#include "../inc/libasm.h"
 
 /*int fd = rdi, const void *buf = rsi, size_t count = rcx*/
 void    ft_write() {

@@ -1,17 +1,12 @@
-#include "libasm.h"
+#include "./inc/libasm.h"
 
 
 unsigned char stack[STACK_SIZE] = {0};
 ssize_t rax = 0, rbx = 0, rcx = 0, rdx = 0, rsi = 0, rdi = 0, rbp = 0, 
 rsp = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0;
 
-static void    stack_init(void)
-{
-    rsp = STACK_SIZE;
-    rbp = STACK_SIZE;
-}
-
 int     main(void) {
+
 
     stack_init();
 
@@ -54,7 +49,5 @@ int     main(void) {
     printf("ft_strdup = %s", (char*)res);
 
     
-
-    
-    return 0;
+    return (0);
 }
