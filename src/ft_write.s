@@ -3,24 +3,24 @@ section .text
 	extern __errno_location
 	global ft_write
 
-ft_write:							      ; ssize_t write(int fd = rdi, const void *buf = rsi, size_t count = rdx); {
-									      ;
-	mov		rax, 1					      ; 	ssize_t res = SYS_WRITE;
-	syscall							      ;	res = syscall(res, fd, buf, count);
-	test	rax, rax				      ; 	if (res < 0)
-	js		.error					      ;		return (error(res));
-	ret								      ;	return (res);
-                                          ; }
+ft_write:							      
+									      
+	mov		rax, 1					      
+	syscall							      
+	test	rax, rax				      
+	js		.error					      
+	ret								      
+                                          
 
-	.error:							      ; ssize_t error(ssize_t res) {
-	                                      ;
-		push	rbx					      ;	stack++;
-		neg		eax					      ;	(int)res = (int)-res;
-		mov		ebx, eax			      ;	(int)(*stack) = (int)res;
-		call 	__errno_location wrt ..plt;	char *err_addr = ___errno_location();
-		mov		dword [rax], ebx	      ;	*err_addr = (int)(*stack);
-		mov		rax, -1				      ;	res = -1;
-		pop		rbx					      ;	stack--;
-		ret							      ;	return (res);
-									      ; }
+	.error:							      
+	                                      
+		push	rbx					      
+		neg		eax					      
+		mov		ebx, eax			      
+		call 	__errno_location wrt ..plt
+		mov		dword [rax], ebx	      
+		mov		rax, -1				      
+		pop		rbx					      
+		ret							      
+									      
 	

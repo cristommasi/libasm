@@ -21,23 +21,23 @@ ft_strdup:
     mov     temp, 0
 
     .len:
-        xor     rax, rax            ; int ret = 0;
-        call    ft_strlen wrt ..plt ; ret = ft_strlen(src);
-        mov     len, rax            ; int len = ret;
+        xor     rax, rax            
+        call    ft_strlen wrt ..plt 
+        mov     len, rax            
 
     .alloc:
-        xor     rax, rax            ; ret = 0;
-        mov     rdi, len            ; size_t size = len;
-        inc     rdi                 ; size++;
-        call    malloc wrt ..plt    ; ret = malloc(size);
-        test    rax, rax            ; if (!ret)
-        jz     .error               ; goto error;
-        mov     temp, rax           ; char *temp = ret;
+        xor     rax, rax            
+        mov     rdi, len            
+        inc     rdi                 
+        call    malloc wrt ..plt    
+        test    rax, rax            
+        jz     .error               
+        mov     temp, rax           
 
     .copy:
-        mov     rdi, temp           ; char *dest = temp;
-        mov     rsi, param0         ; char *src = saved_param
-        call    ft_strcpy wrt ..plt ; char *res = ft_strcpy(dest, src);
+        mov     rdi, temp           
+        mov     rsi, param0         
+        call    ft_strcpy wrt ..plt 
         jmp     .return
 
 

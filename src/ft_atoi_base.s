@@ -118,8 +118,8 @@ get_base:
         mov         r11, 0              ; char c = base[i]
 
     .loop:
-        mov     rax, base_ptr ; rax = base
-        movzx   r11, byte [rax + r10] ; r11 = base[i]
+        mov     rax, base_ptr           ; rax = base
+        movzx   r11, byte [rax + r10]   ; r11 = base[i]
         cmp     r11, 0
         je      .ret
 

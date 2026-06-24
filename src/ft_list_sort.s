@@ -53,8 +53,8 @@ ft_list_sort:
                 mov     rdi, [cur + S_INFO.data]
                 mov     rsi, [next + S_INFO.data]
                 call    f_cmp                                               ; int ret = cmp(cur->data, next->data);
-                test     eax, eax                                              ; if (!ret)
-                jle      .no_swap                                            ; goto noswap;
+                test     eax, eax                                           ; if (!ret)
+                jle      .no_swap                                           ; goto noswap;
 
                 .swap:
 
