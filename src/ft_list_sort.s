@@ -1,4 +1,4 @@
-%include "../inc/libasm_bonus.inc"
+%include "../inc/libasm.inc"
 
 %define begin_list rbx
 %define f_cmp      r12

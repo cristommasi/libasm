@@ -1,5 +1,5 @@
 
-%include "libasm.inc"
+%include "../inc/libasm.inc"
 
 section .text
 	global  ft_strdup

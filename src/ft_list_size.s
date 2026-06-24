@@ -1,4 +1,4 @@
-%include "libasm_bonus.inc"
+%include "../inc/libasm.inc"
 
 section .text
     global ft_list_size
